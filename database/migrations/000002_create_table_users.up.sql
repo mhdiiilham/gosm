@@ -4,6 +4,7 @@ CREATE TABLE "users" (
     "last_name" varchar,
     "role" user_roles NOT NULL,
     "email" varchar UNIQUE NOT NULL,
+    "password" varchar NOT NULL,
     "country_code" varchar,
     "phone_number" varchar,
     "created_at" timestamp DEFAULT (now()),
