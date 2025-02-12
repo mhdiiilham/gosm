@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/mhdiiilham/dating-app/entity"
+	"github.com/mhdiiilham/gosm/entity"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -13,9 +13,10 @@ import (
 // and custom claims like the user ID and email.
 type TokenClaims struct {
 	jwt.StandardClaims
-	ID      string `json:"id"`
-	EventID string `json:"event_id"`
-	Email   string `json:"email"`
+	ID      string          `json:"id"`
+	EventID string          `json:"event_id"`
+	Email   string          `json:"email"`
+	Role    entity.UserRole `json:"role"`
 }
 
 // JwtGenerator is responsible for generating and validating JWT tokens.
@@ -46,7 +47,7 @@ func NewJwtGenerator(
 
 // CreateAccessToken generates a JWT token containing the user's ID and email.
 // The token is signed using the configured signing method and secret key.
-func (g JwtGenerator) CreateAccessToken(userID, email string, eventID *string) (accessToken string, err error) {
+func (g JwtGenerator) CreateAccessToken(userID, email string, userRole entity.UserRole) (accessToken string, err error) {
 	claims := TokenClaims{
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    g.applicationName,
@@ -54,10 +55,7 @@ func (g JwtGenerator) CreateAccessToken(userID, email string, eventID *string) (
 		},
 		ID:    userID,
 		Email: email,
-	}
-
-	if eventID != nil {
-		claims.EventID = *eventID
+		Role:  userRole,
 	}
 
 	token := jwt.NewWithClaims(g.signingMethod, claims)
@@ -83,7 +81,7 @@ func (g JwtGenerator) ParseToken(accessToken string) (*TokenClaims, error) {
 
 	if err != nil {
 		log.Warnf("[JwtGenerator.ParseToken] Error parsing token: %v", err)
-		return nil, entity.ErrInternalServerError
+		return nil, entity.UnknownError(err)
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)

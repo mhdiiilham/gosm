@@ -46,3 +46,23 @@ func NewBadRequestError(code string, message string) error {
 		Source:  nil,
 	}
 }
+
+var (
+	// ErrUserExisted is returned when a user provides an email existed in database.
+	ErrUserExisted error = NewBadRequestError("USER_EXISTED", "user is already existed")
+
+	// ErrUserInvalidEmailAddress represents an error when the provided email format is invalid.
+	ErrUserInvalidEmailAddress error = NewBadRequestError("USER_INVALID_EMAIL", "provided user email address is invalid")
+
+	// ErrUserRoleIsEmpty represents an error when the provided user's role format is invalid.
+	ErrUserRoleIsEmpty error = NewBadRequestError("USER_INVALID_ROLE", "please provide valid user's role")
+
+	// ErrUserFirstNameEmpty represents an error when the provided name format is empty.
+	ErrUserFirstNameEmpty error = NewBadRequestError("USER_INVALID_NAME", "please provide valid user's name")
+
+	// ErrUserPasswordEmpty represents an error when the provided password is empty.
+	ErrUserPasswordEmpty error = NewBadRequestError("USER_INVALID_PASSWORD", "please provide valid user's password")
+
+	// ErrInvalidSignInPayload represents an error when the provided email and password combination is not valid.
+	ErrInvalidSignInPayload error = NewBadRequestError("AUTH_INVALID_CREDENTIAL", "please provide valid email and password combination")
+)
