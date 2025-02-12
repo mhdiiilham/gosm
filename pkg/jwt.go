@@ -24,7 +24,6 @@ type TokenClaims struct {
 // token expiration duration, signing method, and signature key.
 type JwtGenerator struct {
 	applicationName string
-	tokenDuration   time.Duration
 	signingMethod   *jwt.SigningMethodHMAC
 	signatureKey    string
 }
@@ -34,12 +33,10 @@ type JwtGenerator struct {
 // and signature key for signing the tokens.
 func NewJwtGenerator(
 	applicationName string,
-	tokenDuration time.Duration,
 	signatureKey string,
 ) *JwtGenerator {
 	return &JwtGenerator{
 		applicationName: applicationName,
-		tokenDuration:   tokenDuration,
 		signingMethod:   jwt.SigningMethodHS256,
 		signatureKey:    signatureKey,
 	}
@@ -47,11 +44,13 @@ func NewJwtGenerator(
 
 // CreateAccessToken generates a JWT token containing the user's ID and email.
 // The token is signed using the configured signing method and secret key.
-func (g JwtGenerator) CreateAccessToken(userID, email string, userRole entity.UserRole) (accessToken string, err error) {
+func (g JwtGenerator) CreateAccessToken(userID, email string, userRole entity.UserRole, duration time.Duration) (accessToken, expireAt string, err error) {
+	tokenExpiredAt := time.Now().Add(duration)
 	claims := TokenClaims{
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    g.applicationName,
-			ExpiresAt: time.Now().Add(g.tokenDuration).Unix(),
+			ExpiresAt: tokenExpiredAt.Unix(),
+			NotBefore: time.Now().Unix(),
 		},
 		ID:    userID,
 		Email: email,
@@ -62,10 +61,10 @@ func (g JwtGenerator) CreateAccessToken(userID, email string, userRole entity.Us
 	signedToken, err := token.SignedString([]byte(g.signatureKey))
 	if err != nil {
 		log.Warnf("[JwtGenerator.CreateAccessToken] Error signing token: %v", err)
-		return "", entity.ErrInvalidAccessToken
+		return "", "", entity.ErrInvalidAccessToken
 	}
 
-	return signedToken, nil
+	return signedToken, tokenExpiredAt.Format(time.RFC3339Nano), nil
 }
 
 // ParseToken verifies and extracts claims from a signed JWT token.

@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -22,7 +21,7 @@ import (
 func main() {
 	// Server configuration here:
 	const ops = "main"
-	const port = "8080"
+	const port = "9091"
 	dbURL := os.Getenv("DATABASE_URL")
 	jwtSignature := os.Getenv("JWT_KEY")
 
@@ -50,7 +49,7 @@ func main() {
 
 	// pkg here:
 	passwordHasher := pkg.Hasher{}
-	jwtToken := pkg.NewJwtGenerator("gosm", 2*time.Hour, jwtSignature)
+	jwtToken := pkg.NewJwtGenerator("gosm", jwtSignature)
 
 	// Repositories here:
 	userRepository := repository.NewUserRepository(dbConn)
@@ -61,7 +60,7 @@ func main() {
 	authHandler := delivery.NewAuthHandler(authService)
 	authHandler.RegisterAuthRoutes(e.Group("api/v1/auth"))
 
-	srv, err := server.New("8081")
+	srv, err := server.New(port)
 	if err != nil {
 		logger.Fatalf(ctx, ops, "failed to create new server: %v", err)
 	}

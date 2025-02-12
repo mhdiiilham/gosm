@@ -65,4 +65,7 @@ var (
 
 	// ErrInvalidSignInPayload represents an error when the provided email and password combination is not valid.
 	ErrInvalidSignInPayload error = NewBadRequestError("AUTH_INVALID_CREDENTIAL", "please provide valid email and password combination")
+
+	// ErrInvalidAccessToken represents an error when the provided access token is not valid.
+	ErrInvalidAccessToken error = NewBadRequestError("AUTH_INVALID_TOKEN", "provided token is not valid")
 )
