@@ -46,15 +46,18 @@ func NewJwtGenerator(
 
 // CreateAccessToken generates a JWT token containing the user's ID and email.
 // The token is signed using the configured signing method and secret key.
-func (g JwtGenerator) CreateAccessToken(userID, eventID, email string) (accessToken string, err error) {
+func (g JwtGenerator) CreateAccessToken(userID, email string, eventID *string) (accessToken string, err error) {
 	claims := TokenClaims{
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    g.applicationName,
 			ExpiresAt: time.Now().Add(g.tokenDuration).Unix(),
 		},
-		ID:      userID,
-		EventID: eventID,
-		Email:   email,
+		ID:    userID,
+		Email: email,
+	}
+
+	if eventID != nil {
+		claims.EventID = *eventID
 	}
 
 	token := jwt.NewWithClaims(g.signingMethod, claims)

@@ -27,7 +27,7 @@ func TestCreateAccessToken(t *testing.T) {
 		t.Run(tc.condition, func(t *testing.T) {
 			assert := assert.New(t)
 			jwtGeneratorClient := pkg.NewJwtGenerator("gosm", 2*time.Hour, "the secret of kalimdor")
-			accessToken, actualErr := jwtGeneratorClient.CreateAccessToken("1", "hi@muhammadilham.xyz")
+			accessToken, actualErr := jwtGeneratorClient.CreateAccessToken("1", "hi@muhammadilham.xyz", nil)
 			assert.Equal(tc.expectedErr, actualErr)
 
 			claims, err := jwtGeneratorClient.ParseToken(accessToken)
