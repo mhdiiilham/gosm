@@ -3,11 +3,11 @@ CREATE TABLE "users" (
     "first_name" varchar NOT NULL,
     "last_name" varchar,
     "role" user_roles NOT NULL,
-    "email" varchar UNIQUE NOT NULL,
+    "email" varchar,
     "password" varchar NOT NULL,
     "country_code" varchar,
     "phone_number" varchar,
     "created_at" timestamp DEFAULT (now()),
-    "updated_at" timestamp,
+    "updated_at" timestamp DEFAULT (now()),
     "deleted_at" timestamp
 );
