@@ -21,7 +21,8 @@ type SignInRequest struct {
 
 // AccessTokenResponse represents the response returned after successful authentication.
 type AccessTokenResponse struct {
-	Email       string `json:"email"`
-	AccessToken string `json:"access_token"`
-	ExpiresAt   string `json:"expires_at"`
+	Email       string          `json:"email"`
+	AccessToken string          `json:"access_token"`
+	ExpiresAt   string          `json:"expires_at"`
+	Role        entity.UserRole `json:"role"`
 }

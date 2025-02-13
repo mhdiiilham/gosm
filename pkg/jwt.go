@@ -13,10 +13,9 @@ import (
 // and custom claims like the user ID and email.
 type TokenClaims struct {
 	jwt.StandardClaims
-	ID      string          `json:"id"`
-	EventID string          `json:"event_id"`
-	Email   string          `json:"email"`
-	Role    entity.UserRole `json:"role"`
+	ID    string          `json:"id"`
+	Email string          `json:"email"`
+	Role  entity.UserRole `json:"role"`
 }
 
 // JwtGenerator is responsible for generating and validating JWT tokens.
@@ -44,7 +43,7 @@ func NewJwtGenerator(
 
 // CreateAccessToken generates a JWT token containing the user's ID and email.
 // The token is signed using the configured signing method and secret key.
-func (g JwtGenerator) CreateAccessToken(userID, email string, userRole entity.UserRole, duration time.Duration) (accessToken, expireAt string, err error) {
+func (g JwtGenerator) CreateAccessToken(userID, email string, userRole entity.UserRole, duration time.Duration) (response *entity.AuthResponse, err error) {
 	tokenExpiredAt := time.Now().Add(duration)
 	claims := TokenClaims{
 		StandardClaims: jwt.StandardClaims{
@@ -61,10 +60,15 @@ func (g JwtGenerator) CreateAccessToken(userID, email string, userRole entity.Us
 	signedToken, err := token.SignedString([]byte(g.signatureKey))
 	if err != nil {
 		log.Warnf("[JwtGenerator.CreateAccessToken] Error signing token: %v", err)
-		return "", "", entity.ErrInvalidAccessToken
+		return nil, entity.ErrInvalidAccessToken
 	}
 
-	return signedToken, tokenExpiredAt.Format(time.RFC3339Nano), nil
+	return &entity.AuthResponse{
+		AccessToken: signedToken,
+		ExpiresAt:   tokenExpiredAt.Format(time.RFC3339Nano),
+		Email:       email,
+		Role:        userRole,
+	}, nil
 }
 
 // ParseToken verifies and extracts claims from a signed JWT token.
@@ -91,11 +95,11 @@ func (g JwtGenerator) ParseToken(accessToken string) (*TokenClaims, error) {
 
 	email, _ := claims["email"].(string)
 	id, _ := claims["id"].(string)
-	eventID, _ := claims["event_id"].(string)
+	userRole, _ := claims["role"].(string)
 
 	return &TokenClaims{
-		Email:   email,
-		ID:      id,
-		EventID: eventID,
+		ID:    id,
+		Email: email,
+		Role:  entity.UserRole(userRole),
 	}, nil
 }

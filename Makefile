@@ -1,5 +1,10 @@
 .PHONY: all
 
+VERSION="0.0.1"
+
+dev:
+	go run cmd/restful/main.go
+
 migrate-create:
 	@read -p  "Migration name (eg:create_users, alter_entities, ...): " NAME; \
 	migrate create -ext sql -seq -dir database/migrations $$NAME

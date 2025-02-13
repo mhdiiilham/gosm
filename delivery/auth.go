@@ -15,8 +15,8 @@ import (
 // AuthService defines authentication-related operations.
 type AuthService interface {
 	RegisterNewUser(ctx context.Context, user entity.User) (createdUser *entity.User, err error)
-	GenerateAccessToken(ctx context.Context, user entity.User, duration time.Duration) (accessToken, expireAt string, err error)
-	UserSignIn(ctx context.Context, email, password string, remember bool) (accessToken, expireAt string, err error)
+	GenerateAccessToken(ctx context.Context, user entity.User, duration time.Duration) (authResponse *entity.AuthResponse, err error)
+	UserSignIn(ctx context.Context, email, password string, remember bool) (authResponse *entity.AuthResponse, err error)
 }
 
 // AuthHandler handles authentication-related HTTP requests.
@@ -78,7 +78,7 @@ func (h *AuthHandler) handleSignUp(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, throwInternalServerError(serviceErr))
 	}
 
-	accessToken, expireAt, err := h.authService.GenerateAccessToken(ctx, *newlyCreatedUser, 12*time.Hour)
+	authResponse, err := h.authService.GenerateAccessToken(ctx, *newlyCreatedUser, 12*time.Hour)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
 	}
@@ -87,9 +87,10 @@ func (h *AuthHandler) handleSignUp(c echo.Context) error {
 		StatusCode: http.StatusCreated,
 		Message:    fmt.Sprintf("user %s created", requestBody.FirstName),
 		Data: AccessTokenResponse{
-			Email:       requestBody.Email,
-			AccessToken: accessToken,
-			ExpiresAt:   expireAt,
+			AccessToken: authResponse.AccessToken,
+			ExpiresAt:   authResponse.ExpiresAt,
+			Email:       authResponse.Email,
+			Role:        authResponse.Role,
 		},
 	})
 }
@@ -110,7 +111,7 @@ func (h *AuthHandler) handleSignIn(c echo.Context) error {
 		})
 	}
 
-	accessToken, expireAt, serviceErr := h.authService.UserSignIn(ctx, requestBody.Email, requestBody.Password, requestBody.Remember)
+	authResponse, serviceErr := h.authService.UserSignIn(ctx, requestBody.Email, requestBody.Password, requestBody.Remember)
 	if serviceErr != nil {
 		logger.Errorf(ctx, ops, "user sign in fails: %v", serviceErr)
 		switch err := serviceErr.(type) {
@@ -132,9 +133,10 @@ func (h *AuthHandler) handleSignIn(c echo.Context) error {
 		StatusCode: http.StatusOK,
 		Message:    "success",
 		Data: AccessTokenResponse{
-			Email:       requestBody.Email,
-			AccessToken: accessToken,
-			ExpiresAt:   expireAt,
+			AccessToken: authResponse.AccessToken,
+			ExpiresAt:   authResponse.ExpiresAt,
+			Email:       authResponse.Email,
+			Role:        authResponse.Role,
 		},
 	})
 }
