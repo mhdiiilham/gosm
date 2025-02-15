@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [1.6.0](https://github.com/mhdiiilham/gosm/compare/v1.5.0...v1.6.0) (2025-02-15)
+
+
+### Features
+
+* fix variables ([fa97137](https://github.com/mhdiiilham/gosm/commit/fa9713797dbe42bc19e2d379fa8b04c1ccd80f0c))
+* fix variables Merge pull request [#6](https://github.com/mhdiiilham/gosm/issues/6) from mhdiiilham/bump/version ([eb1d685](https://github.com/mhdiiilham/gosm/commit/eb1d685da5886416ce9ce9c8364856f520335cd4))
+
 # [1.5.0](https://github.com/mhdiiilham/gosm/compare/v1.4.0...v1.5.0) (2025-02-15)
 
 
