@@ -70,15 +70,15 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT }}/gosm:${{ github.ref_name }} --build-arg VERSION=${{ github.ref_name }} .
-          docker push gcr.io/${{ secrets.GCP_PROJECT }}/gosm:${{ github.ref_name }}
+          docker build -t gcr.io/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }} --build-arg VERSION=${{ github.ref_name }} .
+          docker push gcr.io/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
 
       - name: Deploy to Cloud Run
         id: gohibeesh
         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: gosm
-          image: gcr.io/${{ secrets.GCP_PROJECT }}/gosm:${{ github.ref_name }}
+          image: gcr.io/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
           region: us-west1
 
       - name: Show Output
