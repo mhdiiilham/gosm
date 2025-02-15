@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,12 +12,14 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mhdiiilham/gosm/config"
 	"github.com/mhdiiilham/gosm/database"
 	"github.com/mhdiiilham/gosm/delivery"
 	"github.com/mhdiiilham/gosm/logger"
 	"github.com/mhdiiilham/gosm/pkg"
 	"github.com/mhdiiilham/gosm/repository"
 	"github.com/mhdiiilham/gosm/service"
+	"github.com/mhdiiilham/gosm/thirdparty/kirimwa"
 )
 
 var version = "v0.0.1"
@@ -24,22 +28,27 @@ var env = "local"
 func main() {
 	// Server configuration here:
 	const ops = "main"
-	const port = ":9091"
-	dbURL := os.Getenv("DATABASE_URL")
-	jwtSignature := os.Getenv("JWT_KEY")
+	var env string
+	flag.StringVar(&env, "env", "local", "set the environment of the server")
 
 	ctx, done := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	defer done()
 
-	logger.Info(ctx, ops, "starting api (%s) env=%s", version, env)
+	logger.Infof(ctx, ops, "starting api (%s) env=%s", version, env)
+	cfg, err := config.ReadConfiguration(ctx, env)
+	if err != nil {
+		panic(err)
+	}
 
-	logger.Info(ctx, ops, "connecting to db")
-	dbConn, err := database.ConnectPGSQL(dbURL)
+	fmt.Println(cfg)
+
+	logger.Infof(ctx, ops, "connecting to db")
+	dbConn, err := database.ConnectPGSQL(cfg.Database.URL, cfg.Database.MaxOpenConns, cfg.Database.MaxIdleConns, 60*time.Second)
 	if err != nil {
 		logger.Fatalf(ctx, ops, "connecting to db failed %v", err)
 	}
 
-	logger.Info(ctx, ops, "starting echo...")
+	logger.Infof(ctx, ops, "starting echo...")
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
@@ -47,20 +56,31 @@ func main() {
 
 	// pkg here:
 	passwordHasher := pkg.Hasher{}
-	jwtToken := pkg.NewJwtGenerator("gosm", jwtSignature)
+	jwtToken := pkg.NewJwtGenerator(cfg.Name, cfg.JWTKey)
+	kirimWaClient := kirimwa.NewKirimWAClient(cfg.Service.KirimWa.Key, cfg.Service.KirimWa.DeviceID)
 
 	// Repositories here:
 	userRepository := repository.NewUserRepository(dbConn)
+	eventRepository := repository.NewEventRepository(dbConn)
 
 	// Usecase here:
 	authService := service.NewAuthorizationService(userRepository, passwordHasher, jwtToken)
+	eventService := service.NewEventService(eventRepository, kirimWaClient, eventRepository.RunInTransactions)
+
+	// register routes here:
+	e.GET("/api/v1/public/guests", delivery.GetGuestByItShortID(eventService))
+
+	middleware := delivery.NewMiddleware(jwtToken, userRepository)
 
 	authHandler := delivery.NewAuthHandler(authService)
 	authHandler.RegisterAuthRoutes(e.Group("api/v1/auth"))
 
+	eventHandler := delivery.NewEventHandler(eventService)
+	eventHandler.RegisterEventRoutes(e.Group("api/v1/events"), middleware)
+
 	// Start server
 	go func() {
-		if err := e.Start(port); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(cfg.GetPort()); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("shutting down the server")
 		}
 	}()
@@ -72,6 +92,6 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 
-	logger.Info(ctx, ops, "closing db connection: %v", dbConn.Close())
-	logger.Info(ctx, ops, "server shutdown")
+	logger.Infof(ctx, ops, "closing db connection: %v", dbConn.Close())
+	logger.Infof(ctx, ops, "server shutdown")
 }

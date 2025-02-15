@@ -50,6 +50,7 @@ func (g JwtGenerator) CreateAccessToken(userID, email string, userRole entity.Us
 			Issuer:    g.applicationName,
 			ExpiresAt: tokenExpiredAt.Unix(),
 			NotBefore: time.Now().Unix(),
+			IssuedAt:  time.Now().Unix(),
 		},
 		ID:    userID,
 		Email: email,
@@ -84,7 +85,7 @@ func (g JwtGenerator) ParseToken(accessToken string) (*TokenClaims, error) {
 
 	if err != nil {
 		log.Warnf("[JwtGenerator.ParseToken] Error parsing token: %v", err)
-		return nil, entity.UnknownError(err)
+		return nil, entity.ErrAuthTokenIsExpired
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)

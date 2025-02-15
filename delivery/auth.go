@@ -35,7 +35,6 @@ func (h *AuthHandler) RegisterAuthRoutes(e *echo.Group) {
 	e.POST("/signup", h.handleSignUp)
 }
 
-// handleSignUp processes user registration requests.
 func (h *AuthHandler) handleSignUp(c echo.Context) error {
 	ctx := c.Request().Context()
 	const ops = "AuthHandler.handleSignUp"
@@ -95,7 +94,6 @@ func (h *AuthHandler) handleSignUp(c echo.Context) error {
 	})
 }
 
-// handleSignIn processes user signIn requests.
 func (h *AuthHandler) handleSignIn(c echo.Context) error {
 	ctx := c.Request().Context()
 	const ops = "AuthHandler.handleSignIn"

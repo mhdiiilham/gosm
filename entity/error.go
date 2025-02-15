@@ -68,4 +68,7 @@ var (
 
 	// ErrInvalidAccessToken represents an error when the provided access token is not valid.
 	ErrInvalidAccessToken error = NewBadRequestError("AUTH_INVALID_TOKEN", "provided token is not valid")
+
+	// ErrAuthTokenIsExpired represents an error when the provided access token is expired.
+	ErrAuthTokenIsExpired error = NewBadRequestError("AUTH_TOKEN_EXPIRED", "provided access token is expired")
 )
