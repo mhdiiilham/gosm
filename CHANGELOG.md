@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [1.2.0](https://github.com/mhdiiilham/gosm/compare/v1.1.0...v1.2.0) (2025-02-15)
+
+
+### Features
+
+* bump version ([a24ecc0](https://github.com/mhdiiilham/gosm/commit/a24ecc01c380dd3fcfed9317c1083c472bc80936))
+* Merge pull request [#3](https://github.com/mhdiiilham/gosm/issues/3) from mhdiiilham/feature/events ([fc547c0](https://github.com/mhdiiilham/gosm/commit/fc547c0bc34d077839b7079fac5f63b02b1859c6))
+
 # [1.1.0](https://github.com/mhdiiilham/gosm/compare/v1.0.0...v1.1.0) (2025-02-15)
 
 
