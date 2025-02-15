@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.7.0](https://github.com/mhdiiilham/gosm/compare/v1.6.0...v1.7.0) (2025-02-15)
+
+
+### Features
+
+* one last fix and deploy then rest... ([1144776](https://github.com/mhdiiilham/gosm/commit/114477667b85713e1294e5a34d4cde7788690eb4))
+
 # [1.6.0](https://github.com/mhdiiilham/gosm/compare/v1.5.0...v1.6.0) (2025-02-15)
 
 
