@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.4.0](https://github.com/mhdiiilham/gosm/compare/v1.3.0...v1.4.0) (2025-02-15)
+
+
+### Features
+
+* **deployment:** update go's image version ([e91502b](https://github.com/mhdiiilham/gosm/commit/e91502b3db80ce1fd986def86349a0de737c39bd))
+
 # [1.3.0](https://github.com/mhdiiilham/gosm/compare/v1.2.0...v1.3.0) (2025-02-15)
 
 
