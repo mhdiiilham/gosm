@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.11.0](https://github.com/mhdiiilham/gosm/compare/v1.10.0...v1.11.0) (2025-02-15)
+
+
+### Bug Fixes
+
+* please this work ([4cf2933](https://github.com/mhdiiilham/gosm/commit/4cf2933a6a90ce7d77cccb68197fd2f41a8eede5))
+
+
+### Features
+
+* **ci:** if this not work, I'll sleep ([e1a7fd3](https://github.com/mhdiiilham/gosm/commit/e1a7fd3efb1c6c801abdcf0457593eaae0954892))
+
 # [1.10.0](https://github.com/mhdiiilham/gosm/compare/v1.9.0...v1.10.0) (2025-02-15)
 
 
