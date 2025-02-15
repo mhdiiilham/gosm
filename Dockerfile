@@ -13,4 +13,4 @@ FROM scratch
 COPY --from=builder /gosm/gosm .
 COPY --from=builder /gosm/config.*.yaml .
 EXPOSE 8080
-CMD [ "/gosm", "-env=${APP_ENV}" ]
+CMD [ "/gosm", "-env", "${APP_ENV}" ]
