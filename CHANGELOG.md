@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.3.0](https://github.com/mhdiiilham/gosm/compare/v1.2.0...v1.3.0) (2025-02-15)
+
+
+### Features
+
+* **ci:** migrations path ([8435a41](https://github.com/mhdiiilham/gosm/commit/8435a41712a706e9d5aa4fd8c6f94e20bea215d5))
+
 # [1.2.0](https://github.com/mhdiiilham/gosm/compare/v1.1.0...v1.2.0) (2025-02-15)
 
 
