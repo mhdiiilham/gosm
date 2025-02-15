@@ -11,6 +11,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags="-X main.ve
 
 FROM scratch
 COPY --from=builder /gosm/gosm .
-COPY --from=builder /gosm/config.prod.yaml .
+COPY --from=builder /gosm/config.${APP_ENV}.yaml .
 EXPOSE 8080
 CMD [ "/gosm", "-env=${APP_ENV}" ]
