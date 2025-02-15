@@ -1,6 +1,8 @@
 FROM golang:1.23.4-alpine AS builder
 ARG VERSION
 ENV VERSION=${VERSION}
+ARG APP_ENV
+ENV APP_ENV=${APP_ENV}
 RUN apk update && apk add --no-cache git
 WORKDIR /gosm
 COPY . /gosm/
@@ -11,4 +13,4 @@ FROM scratch
 COPY --from=builder /gosm/gosm .
 COPY --from=builder /gosm/config.prod.yaml .
 EXPOSE 8080
-CMD [ "/gosm", "-env=prod" ]
+CMD [ "/gosm", "-env=${APP_ENV}" ]
