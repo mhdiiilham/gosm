@@ -1,0 +1,12 @@
+env: production
+name: gosm
+port: '8080'
+jwtKey:
+database:
+  url:
+  maxOpenConns: 20
+  maxIdleConns: 10
+services:
+  kirimWa:
+    key:
+    deviceId:

@@ -12,9 +12,9 @@ type RequestID string
 // RequestIDKey is the context key used to store and retrieve the request ID.
 var RequestIDKey RequestID = "request-id"
 
-// Info logs an informational message with contextual request ID and caller details.
+// Infof logs an informational message with contextual request ID and caller details.
 // It accepts a context, caller name, formatted message, and optional values.
-func Info(ctx context.Context, caller, format string, values ...interface{}) {
+func Infof(ctx context.Context, caller, format string, values ...interface{}) {
 	requestID := "-"
 	ctxVal := ctx.Value(RequestIDKey)
 	if ctxVal != nil {

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"net/mail"
+	"time"
 
 	"github.com/mhdiiilham/gosm/entity"
 	"github.com/mhdiiilham/gosm/logger"
@@ -23,7 +24,7 @@ type PasswordHasher interface {
 
 // JwtGenerator defines an interface for handling JWT operations, including token creation and parsing.
 type JwtGenerator interface {
-	CreateAccessToken(userID, email string, eventID *string) (accessToken string, err error)
+	CreateAccessToken(userID, email string, userRole entity.UserRole, duration time.Duration) (response *entity.AuthResponse, err error)
 	ParseToken(accessToken string) (*pkg.TokenClaims, error)
 }
 
@@ -88,45 +89,50 @@ func (a *Authenticator) RegisterNewUser(ctx context.Context, user entity.User) (
 // GenerateAccessToken generates a JWT access token for the given user.
 // This function takes a user entity and uses the JWT generator to create a signed access token.
 // If the token generation fails, it logs the error and returns a structured application error.
-func (a *Authenticator) GenerateAccessToken(ctx context.Context, user entity.User) (accessToken string, err error) {
+func (a *Authenticator) GenerateAccessToken(ctx context.Context, user entity.User, duration time.Duration) (authResponse *entity.AuthResponse, err error) {
 	const ops = "Authenticator.GenerateAccessToken"
 
 	// Generate an access token using the JWT generator
-	accessToken, err = a.jwtGenerator.CreateAccessToken(user.ID, user.Email, nil)
+	authResponse, err = a.jwtGenerator.CreateAccessToken(user.ID, user.Email, user.Role, duration)
 	if err != nil {
 		logger.Errorf(ctx, ops, "failed to generate user access token: %v", err)
-		return accessToken, entity.UnknownError(err)
+		return nil, entity.UnknownError(err)
 	}
 
-	return accessToken, nil
+	return authResponse, nil
 }
 
 // UserSignIn handles user authentication by validating the provided email and password.
 // It returns an access token upon successful authentication.
-func (a *Authenticator) UserSignIn(ctx context.Context, email, password string) (accessToken string, err error) {
+func (a *Authenticator) UserSignIn(ctx context.Context, email, password string, remember bool) (authResponse *entity.AuthResponse, err error) {
 	const ops = "Authenticator.UserSignIn"
 
 	if email == "" || password == "" {
-		return "", entity.ErrInvalidSignInPayload
+		return nil, entity.ErrInvalidSignInPayload
 	}
 
 	if _, err := mail.ParseAddress(email); err != nil {
-		return "", entity.ErrUserInvalidEmailAddress
+		return nil, entity.ErrUserInvalidEmailAddress
 	}
 
 	user, err := a.userRepository.FindByEmail(ctx, email)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return "", entity.ErrInvalidSignInPayload
+			return nil, entity.ErrInvalidSignInPayload
 		}
 
 		logger.Errorf(ctx, ops, "failed to retrieve user: %v", err)
-		return "", entity.UnknownError(err)
+		return nil, entity.UnknownError(err)
 	}
 
 	if !a.passwordHasher.ComparePassword(password, user.Password) {
-		return "", entity.ErrInvalidSignInPayload
+		return nil, entity.ErrInvalidSignInPayload
 	}
 
-	return a.GenerateAccessToken(ctx, *user)
+	duration := 12 * time.Hour
+	if remember {
+		duration = 168 * time.Hour // one week
+	}
+
+	return a.GenerateAccessToken(ctx, *user, duration)
 }

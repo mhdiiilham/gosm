@@ -16,10 +16,13 @@ type SignUpRequest struct {
 type SignInRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Remember bool   `json:"remember"`
 }
 
 // AccessTokenResponse represents the response returned after successful authentication.
 type AccessTokenResponse struct {
-	Email       string `json:"email"`
-	AccessToken string `json:"access_token"`
+	Email       string          `json:"email"`
+	AccessToken string          `json:"access_token"`
+	ExpiresAt   string          `json:"expires_at"`
+	Role        entity.UserRole `json:"role"`
 }

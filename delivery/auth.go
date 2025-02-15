@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/AlekSi/pointer"
 	"github.com/labstack/echo/v4"
@@ -14,8 +15,8 @@ import (
 // AuthService defines authentication-related operations.
 type AuthService interface {
 	RegisterNewUser(ctx context.Context, user entity.User) (createdUser *entity.User, err error)
-	GenerateAccessToken(ctx context.Context, user entity.User) (accessToken string, err error)
-	UserSignIn(ctx context.Context, email, password string) (accessToken string, err error)
+	GenerateAccessToken(ctx context.Context, user entity.User, duration time.Duration) (authResponse *entity.AuthResponse, err error)
+	UserSignIn(ctx context.Context, email, password string, remember bool) (authResponse *entity.AuthResponse, err error)
 }
 
 // AuthHandler handles authentication-related HTTP requests.
@@ -30,11 +31,10 @@ func NewAuthHandler(authService AuthService) *AuthHandler {
 
 // RegisterAuthRoutes registers authentication-related endpoints to the provided echo group.
 func (h *AuthHandler) RegisterAuthRoutes(e *echo.Group) {
-	e.POST("/", h.handleSignIn)
+	e.POST("", h.handleSignIn)
 	e.POST("/signup", h.handleSignUp)
 }
 
-// handleSignUp processes user registration requests.
 func (h *AuthHandler) handleSignUp(c echo.Context) error {
 	ctx := c.Request().Context()
 	const ops = "AuthHandler.handleSignUp"
@@ -77,7 +77,7 @@ func (h *AuthHandler) handleSignUp(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, throwInternalServerError(serviceErr))
 	}
 
-	accessToken, err := h.authService.GenerateAccessToken(ctx, *newlyCreatedUser)
+	authResponse, err := h.authService.GenerateAccessToken(ctx, *newlyCreatedUser, 12*time.Hour)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
 	}
@@ -86,13 +86,14 @@ func (h *AuthHandler) handleSignUp(c echo.Context) error {
 		StatusCode: http.StatusCreated,
 		Message:    fmt.Sprintf("user %s created", requestBody.FirstName),
 		Data: AccessTokenResponse{
-			Email:       requestBody.Email,
-			AccessToken: accessToken,
+			AccessToken: authResponse.AccessToken,
+			ExpiresAt:   authResponse.ExpiresAt,
+			Email:       authResponse.Email,
+			Role:        authResponse.Role,
 		},
 	})
 }
 
-// handleSignIn processes user signIn requests.
 func (h *AuthHandler) handleSignIn(c echo.Context) error {
 	ctx := c.Request().Context()
 	const ops = "AuthHandler.handleSignIn"
@@ -108,7 +109,7 @@ func (h *AuthHandler) handleSignIn(c echo.Context) error {
 		})
 	}
 
-	accessToken, serviceErr := h.authService.UserSignIn(ctx, requestBody.Email, requestBody.Password)
+	authResponse, serviceErr := h.authService.UserSignIn(ctx, requestBody.Email, requestBody.Password, requestBody.Remember)
 	if serviceErr != nil {
 		logger.Errorf(ctx, ops, "user sign in fails: %v", serviceErr)
 		switch err := serviceErr.(type) {
@@ -130,8 +131,10 @@ func (h *AuthHandler) handleSignIn(c echo.Context) error {
 		StatusCode: http.StatusOK,
 		Message:    "success",
 		Data: AccessTokenResponse{
-			Email:       requestBody.Email,
-			AccessToken: accessToken,
+			AccessToken: authResponse.AccessToken,
+			ExpiresAt:   authResponse.ExpiresAt,
+			Email:       authResponse.Email,
+			Role:        authResponse.Role,
 		},
 	})
 }
