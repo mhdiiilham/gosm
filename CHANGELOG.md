@@ -1,5 +1,16 @@
 # Semantic Versioning Changelog
 
+# [1.1.0](https://github.com/mhdiiilham/gosm/compare/v1.0.0...v1.1.0) (2025-02-15)
+
+
+### Features
+
+* **auth:** add parameter to remember auth ([3c54172](https://github.com/mhdiiilham/gosm/commit/3c54172c86fbe93232bda31da4443384a59f3bcc))
+* **auth:** jwt response ([d0adade](https://github.com/mhdiiilham/gosm/commit/d0adade432f433ffcaea7a08902e9f3446b92e73))
+* **deplyoment:** add Dockerfile ([98bd876](https://github.com/mhdiiilham/gosm/commit/98bd876312347ef3f04999a84f3cf6da32d0ab04))
+* **event:** basic feature to running event ([debfa4a](https://github.com/mhdiiilham/gosm/commit/debfa4acec1ea33a930d5f58854dad3e44dad316))
+* **events:** Merge pull request [#1](https://github.com/mhdiiilham/gosm/issues/1) from mhdiiilham/feature/events ([726f099](https://github.com/mhdiiilham/gosm/commit/726f0995fbd46ae547cec1a942af218123d15442))
+
 # 1.0.0 (2025-02-12)
 
 
