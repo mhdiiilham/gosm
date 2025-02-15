@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.8.0](https://github.com/mhdiiilham/gosm/compare/v1.7.0...v1.8.0) (2025-02-15)
+
+
+### Features
+
+* update docker build command in deployment.yml ([c82faa5](https://github.com/mhdiiilham/gosm/commit/c82faa5f38592995a49d7c6753ce21187a906501))
+
 # [1.7.0](https://github.com/mhdiiilham/gosm/compare/v1.6.0...v1.7.0) (2025-02-15)
 
 
