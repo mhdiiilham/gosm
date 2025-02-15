@@ -213,7 +213,7 @@ func (s *EventService) SendGuestInvitation(ctx context.Context, userID, eventUUI
 	toSentMessage = strings.ReplaceAll(toSentMessage, "{{event_start_date}}", eventStartDate.Format(time.DateOnly))
 	toSentMessage = strings.ReplaceAll(toSentMessage, "{{event_location}}", targetEvent.Location)
 	toSentMessage = strings.ReplaceAll(toSentMessage, "{{event_digital_invitation_url}}", targetEvent.DigitalInvitationURL)
-	toSentMessage = strings.ReplaceAll(toSentMessage, "{{guest_qr_code_identifier}}", targetGuest.GetQrCodeIdentifier())
+	toSentMessage = strings.ReplaceAll(toSentMessage, "{{guest_qr_code_identifier}}", targetGuest.ShortID)
 	toSentMessage = strings.ReplaceAll(toSentMessage, "{{event_host}}", pointer.GetString(targetEvent.Host))
 
 	// 5. send whatsapp message

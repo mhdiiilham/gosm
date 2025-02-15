@@ -23,13 +23,12 @@ import (
 )
 
 var version = "v0.0.1"
-var env = "local"
 
 func main() {
-	// Server configuration here:
 	const ops = "main"
 	var env string
 	flag.StringVar(&env, "env", "local", "set the environment of the server")
+	flag.Parse()
 
 	ctx, done := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	defer done()
