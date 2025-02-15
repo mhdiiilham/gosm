@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -38,8 +37,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(cfg)
 
 	logger.Infof(ctx, ops, "connecting to db")
 	dbConn, err := database.ConnectPGSQL(cfg.Database.URL, cfg.Database.MaxOpenConns, cfg.Database.MaxIdleConns, 60*time.Second)

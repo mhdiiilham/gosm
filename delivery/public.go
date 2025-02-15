@@ -11,7 +11,6 @@ import (
 func GetGuestByItShortID(srv EventService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		guestShortID := c.QueryParam("short_id")
-		fmt.Println("short_id", guestShortID)
 
 		ctx := c.Request().Context()
 		guest, err := srv.GetGuestByShortID(ctx, guestShortID)

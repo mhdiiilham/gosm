@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strings"
 	"time"
 
@@ -218,7 +217,6 @@ func (s *EventService) SendGuestInvitation(ctx context.Context, userID, eventUUI
 
 	// 5. send whatsapp message
 	_, status, err = s.kirimWAClient.SendMessage(ctx, targetGuest.PhoneNumber, toSentMessage)
-	fmt.Println("err", err)
 
 	// 6. update guest invitation status
 	return status, err
