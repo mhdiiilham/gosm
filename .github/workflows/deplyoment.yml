@@ -56,7 +56,7 @@ jobs:
       - name: Update configuration.*.yaml files
         uses: mikefarah/yq@master
         with:
-          cmd: yq -i '.database.url=["${{ secrets.DATABASE_URL }}"] | .jwtKey=["${{ secrets.JWT_KEY }}"] | .services.kirimWa.key=["${{ secrets.KIRIM_WA_API_KEY }}"] | .services.kirimWa.deviceId=["${{ secrets.KIRIM_WA_DEVICE_ID. }}"]' config.${{ github.event.inputs.environment }}.yaml
+          cmd: yq -i '.database.url=["${{ secrets.DATABASE_URL }}"] | .jwtKey=["${{ secrets.JWT_KEY }}"] | .services.kirimWa.key=["${{ secrets.KIRIM_WA_API_KEY }}"] | .services.kirimWa.deviceId=["${{ secrets.KIRIM_WA_DEVICE_ID }}"]' config.${{ github.event.inputs.environment }}.yaml
 
       - name: Setup Cloud cli
         uses: google-github-actions/setup-gcloud@v0.2.0
