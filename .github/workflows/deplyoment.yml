@@ -70,7 +70,7 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          docker build -t gcr.io/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }} --build-arg VERSION=${{ github.ref_name }} APP_ENV=${{ github.event.inputs.environment }} .
+          docker build -t gcr.io/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }} --build-arg VERSION=${{ github.ref_name }} --build-arg APP_ENV=${{ github.event.inputs.environment }} .
           docker push gcr.io/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
 
       - name: Deploy to Cloud Run
