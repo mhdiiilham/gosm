@@ -40,7 +40,7 @@ func NewKirimWAClient(apiKey string, deviceID string) *Client {
 		apiKey:     apiKey,
 		devideID:   deviceID,
 		baseURL:    "https://api.kirimwa.id/v1/",
-		httpClient: http.DefaultClient,
+		httpClient: &http.Client{},
 	}
 }
 
