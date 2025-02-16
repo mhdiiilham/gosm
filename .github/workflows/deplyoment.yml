@@ -80,6 +80,8 @@ jobs:
           service: gosm
           image: gcr.io/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
           region: us-west1
+          env_vars: |-
+            APP_ENV=${{ github.event.inputs.environment }}
 
       - name: Show Output
         run: echo ${{ steps.gohibeesh.outputs.url }}
