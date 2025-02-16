@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.12.1](https://github.com/mhdiiilham/gosm/compare/v1.12.0...v1.12.1) (2025-02-16)
+
+
+### Bug Fixes
+
+* kirimwa client http ([0fd9f97](https://github.com/mhdiiilham/gosm/commit/0fd9f970f30a1152b02c3e32832ffa142846d654))
+
 # [1.12.0](https://github.com/mhdiiilham/gosm/compare/v1.11.5...v1.12.0) (2025-02-16)
 
 
