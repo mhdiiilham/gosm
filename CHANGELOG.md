@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.11.5](https://github.com/mhdiiilham/gosm/compare/v1.11.4...v1.11.5) (2025-02-16)
+
+
+### Bug Fixes
+
+* configuration variables update ([5576aed](https://github.com/mhdiiilham/gosm/commit/5576aed5d531812487d73ce848d3af50edfbdd6e))
+
 ## [1.11.4](https://github.com/mhdiiilham/gosm/compare/v1.11.3...v1.11.4) (2025-02-16)
 
 
