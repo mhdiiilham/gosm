@@ -15,4 +15,4 @@ COPY --from=builder /gosm/gosm .
 COPY --from=builder /gosm/config.*.yaml .
 
 EXPOSE 8080
-CMD ["/bin/sh", "-c", "/gosm"]
+CMD ["/gosm"]
