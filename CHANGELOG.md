@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.11.3](https://github.com/mhdiiilham/gosm/compare/v1.11.2...v1.11.3) (2025-02-16)
+
+
+### Bug Fixes
+
+* Dockerfile is correct this time ([600d81d](https://github.com/mhdiiilham/gosm/commit/600d81d876f5ea94df4875c51950254053dcd482))
+
 ## [1.11.2](https://github.com/mhdiiilham/gosm/compare/v1.11.1...v1.11.2) (2025-02-16)
 
 
