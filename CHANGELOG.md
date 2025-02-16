@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.12.2](https://github.com/mhdiiilham/gosm/compare/v1.12.1...v1.12.2) (2025-02-16)
+
+
+### Bug Fixes
+
+* copy ca-certificates from builder ([4ca6fc1](https://github.com/mhdiiilham/gosm/commit/4ca6fc1674d74e28df14e6bf868fb4b7444b053a))
+
 ## [1.12.1](https://github.com/mhdiiilham/gosm/compare/v1.12.0...v1.12.1) (2025-02-16)
 
 
