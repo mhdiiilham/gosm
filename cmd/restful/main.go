@@ -32,6 +32,11 @@ func main() {
 	ctx, done := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	defer done()
 
+	// when running inside docker container, we don't need to pas `-env` flag.
+	if os.Getenv("APP_ENV") != "" {
+		env = os.Getenv("APP_ENV")
+	}
+
 	logger.Infof(ctx, ops, "starting api (%s) env=%s", version, env)
 	cfg, err := config.ReadConfiguration(ctx, env)
 	if err != nil {
