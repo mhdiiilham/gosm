@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -82,9 +83,20 @@ func (c *Client) request(ctx context.Context, method string, urlPath string, bod
 
 	response, err := c.httpClient.Do(request)
 	if err != nil {
-		logger.Errorf(ctx, "request", "c.httpClient.Do return err: %v", err)
+		logger.Errorf(ctx, "KirimWAClient.request", "c.httpClient.Do return err: %v", err)
 		return err
 	}
 
-	return json.NewDecoder(response.Body).Decode(&responseDst)
+	// Other than created mark as failed
+	if response.StatusCode != http.StatusCreated {
+		logger.Errorf(ctx, "KirimWAClient.request", "failed to post message: %v", err)
+		return errors.New("INTERNAL_SERVER_ERROR")
+	}
+
+	defer response.Body.Close()
+	if err := json.NewDecoder(response.Body).Decode(&responseDst); err != nil {
+		return err
+	}
+
+	return nil
 }

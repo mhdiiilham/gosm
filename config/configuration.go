@@ -15,7 +15,7 @@ type Configuration struct {
 	Port     string   `mapstructure:"port"`
 	JWTKey   string   `mapstructure:"jwtKey"`
 	Database Database `mapstructure:"database"`
-	Service  Service  `mapstructure:"service"`
+	Service  Service  `mapstructure:"services"`
 }
 
 // Database represent variables required to connect to database.
@@ -27,8 +27,7 @@ type Database struct {
 
 // Service represent variables required to connect with third-party library.
 type Service struct {
-	KirimWaAPIKey string               `mapstructure:"kirimWaKey"`
-	KirimWa       KirimWaConfiguration `mapstructure:"kirimwa"`
+	KirimWa KirimWaConfiguration `mapstructure:"kirimWa"`
 }
 
 // KirimWaConfiguration represent variables required to connect with api.kirimwa.id.
