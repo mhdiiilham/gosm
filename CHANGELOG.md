@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.11.2](https://github.com/mhdiiilham/gosm/compare/v1.11.1...v1.11.2) (2025-02-16)
+
+
+### Bug Fixes
+
+* deployment workflows ([a619cef](https://github.com/mhdiiilham/gosm/commit/a619cef81e886edaac7d76bf773d9d2da965edc0))
+
 ## [1.11.1](https://github.com/mhdiiilham/gosm/compare/v1.11.0...v1.11.1) (2025-02-16)
 
 
