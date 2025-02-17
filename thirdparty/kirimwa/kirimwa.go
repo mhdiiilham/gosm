@@ -86,6 +86,7 @@ func (c *Client) request(ctx context.Context, method string, urlPath string, bod
 		logger.Errorf(ctx, "KirimWAClient.request", "c.httpClient.Do return err: %v", err)
 		return err
 	}
+	defer response.Body.Close()
 
 	// Other than created mark as failed
 	if response.StatusCode != http.StatusCreated {
@@ -93,7 +94,6 @@ func (c *Client) request(ctx context.Context, method string, urlPath string, bod
 		return errors.New("INTERNAL_SERVER_ERROR")
 	}
 
-	defer response.Body.Close()
 	if err := json.NewDecoder(response.Body).Decode(&responseDst); err != nil {
 		return err
 	}

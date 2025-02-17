@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -44,8 +43,6 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("%+v\n", cfg)
-
 	logger.Infof(ctx, ops, "connecting to db")
 	dbConn, err := database.ConnectPGSQL(cfg.Database.URL, cfg.Database.MaxOpenConns, cfg.Database.MaxIdleConns, 60*time.Second)
 	if err != nil {
@@ -56,7 +53,7 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
-	e.GET("/api", delivery.RootHandler())
+	e.GET("/api", delivery.RootHandler(dbConn))
 
 	// pkg here:
 	passwordHasher := pkg.Hasher{}
