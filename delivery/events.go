@@ -23,6 +23,7 @@ type EventService interface {
 	UpdateEvent(ctx context.Context, event entity.Event) (err error)
 	SendGuestInvitation(ctx context.Context, userID, eventUUID, guestUUID string) (status string, err error)
 	GetGuestByShortID(ctx context.Context, guestShortID string) (guest *entity.Guest, err error)
+	UpdateGuestAttendingStatus(ctx context.Context, guestShortID string, isAttending bool, message string) (err error)
 }
 
 // EventHandler handles HTTP requests related to event operations.

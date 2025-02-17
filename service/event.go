@@ -26,6 +26,7 @@ type EventRepository interface {
 	UpdateEvent(ctx context.Context, event entity.Event) (err error)
 	UpdateGuestInvitation(ctx context.Context, guest entity.Guest) (err error)
 	GetGuestByShortID(ctx context.Context, guestShortID string) (guest *entity.Guest, err error)
+	UpdateGuestAttendingStatus(ctx context.Context, guestShortID string, isAttending bool, message string) (err error)
 }
 
 // KirimWAClient defines an interface for sending WhatsApp messages.
@@ -225,4 +226,9 @@ func (s *EventService) SendGuestInvitation(ctx context.Context, userID, eventUUI
 // GetGuestByShortID retrieve guest information based on it short_id.
 func (s *EventService) GetGuestByShortID(ctx context.Context, guestShortID string) (guest *entity.Guest, err error) {
 	return s.eventRepository.GetGuestByShortID(ctx, guestShortID)
+}
+
+// UpdateGuestAttendingStatus update guest's attending status and message.
+func (s *EventService) UpdateGuestAttendingStatus(ctx context.Context, guestShortID string, isAttending bool, message string) (err error) {
+	return s.eventRepository.UpdateGuestAttendingStatus(ctx, guestShortID, isAttending, message)
 }

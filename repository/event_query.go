@@ -142,7 +142,7 @@ var (
 			name,
 			phone_number,
 			message,
-			will_attend_event,
+			will_attend_event::BOOLEAN,
 			qr_code_identifier,
 			is_vip::BOOLEAN,
 			is_invitation_sent,
@@ -175,7 +175,7 @@ var (
 			SET
 			will_attend_event = $1,
 			message = $2
-		WHERE event_user_guests.guest_uuid = $3;
+		WHERE event_user_guests.short_id = $3;
 	`
 
 	// SQLStatemetDeleteGuest delete guest's.

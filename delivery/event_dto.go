@@ -29,3 +29,10 @@ type UpdateGuestVIPStatusRequest struct {
 	GuestUUID string `json:"guest_uuid"`
 	IsVIP     bool   `json:"is_vip"`
 }
+
+// UpdateGuestAttendingAndMessage represents a request to update single guest's attending status.
+type UpdateGuestAttendingAndMessage struct {
+	ShortID     string `json:"short_id"`
+	IsAttending bool   `json:"is_attending"`
+	Message     string `json:"message"`
+}

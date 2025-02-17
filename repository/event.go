@@ -322,3 +322,17 @@ func (r *EventRepository) GetGuestByShortID(ctx context.Context, guestShortID st
 
 	return &targetGuest, nil
 }
+
+// UpdateGuestAttendingStatus update guest's attending status
+func (r *EventRepository) UpdateGuestAttendingStatus(ctx context.Context, guestShortID string, isAttending bool, message string) (err error) {
+	willAttend := "0"
+	if isAttending {
+		willAttend = "1"
+	}
+
+	if _, err := r.db.ExecContext(ctx, SQLStatementUpdateGuestAttendAndMessage, willAttend, message, guestShortID); err != nil {
+		logger.Errorf(ctx, "EventRepository.UpdateGuestAttendingStatus", "failed to update guest: %v", err)
+	}
+
+	return nil
+}
