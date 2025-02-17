@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.13.0](https://github.com/mhdiiilham/gosm/compare/v1.12.2...v1.13.0) (2025-02-17)
+
+
+### Bug Fixes
+
+* refactor ([c42ea0f](https://github.com/mhdiiilham/gosm/commit/c42ea0f7dfcba4419d290ccef012696c104492e0))
+
+
+### Features
+
+* set guest attending and message ([082053c](https://github.com/mhdiiilham/gosm/commit/082053c62b39cbf12d2aba56d65fd932205cd770))
+
 ## [1.12.2](https://github.com/mhdiiilham/gosm/compare/v1.12.1...v1.12.2) (2025-02-16)
 
 
