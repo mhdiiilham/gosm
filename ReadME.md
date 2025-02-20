@@ -1,5 +1,19 @@
 # GOSM
 
+<p align="center">
+  <a href="https://goreportcard.com/report/github.com/mhdiiilham/gosm">
+    <img src="https://goreportcard.com/badge/github.com/mhdiiilham/gosm" alt="Go Report Card">
+  </a>
+  <br>
+  <a href="https://github.com/mhdiiilham/gosm/actions/workflows/deplyoment.yml">
+    <img src="https://github.com/mhdiiilham/gosm/actions/workflows/deplyoment.yml/badge.svg" alt="Deployment">
+  </a>
+  <br>
+  <a href="https://github.com/mhdiiilham/gosm/actions/workflows/release.yml">
+    <img src="https://github.com/mhdiiilham/gosm/actions/workflows/release.yml/badge.svg" alt="Semantic Release">
+  </a>
+</p>
+
 ## Database Migration
 
 ### How to Create a New Migration
