@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.14.0](https://github.com/mhdiiilham/gosm/compare/v1.13.0...v1.14.0) (2025-02-20)
+
+
+### Features
+
+* **guest:** add endpoint to set guest has arrived ([44a6898](https://github.com/mhdiiilham/gosm/commit/44a6898f854c1ab67585055863fed65a5df59948))
+
 # [1.13.0](https://github.com/mhdiiilham/gosm/compare/v1.12.2...v1.13.0) (2025-02-17)
 
 
