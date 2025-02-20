@@ -1,8 +1,8 @@
-.PHONY: all
+.PHONY: docs
 
 VERSION="0.0.1"
 
-dev:
+dev: docs
 	go run cmd/restful/main.go
 
 migrate-create:
@@ -14,3 +14,14 @@ migrate-up:
 
 migrate-down:
 	migrate -database ${DATABASE_URL} -path database/migrations down -all
+
+migrate-status:
+	migrate -database ${DATABASE_URL} -path database/migrations version
+
+migrate-clean:
+	@read -p  "Force to version: " VERSION; \
+	migrate -database ${DATABASE_URL} -path database/migrations force $$VERSION
+
+docs:
+	swag fmt
+	swag init -g cmd/restful/main.go

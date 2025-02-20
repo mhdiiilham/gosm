@@ -14,6 +14,7 @@ import (
 type UserRepository interface {
 	CreateUser(ctx context.Context, newUser entity.User) (createdUser *entity.User, err error)
 	FindByEmail(ct context.Context, email string) (existingUser *entity.User, err error)
+	GetUserByID(ctx context.Context, userID string) (targetUser *entity.User, err error)
 }
 
 // PasswordHasher defines an interface for handling password hashing and comparison.
@@ -135,4 +136,8 @@ func (a *Authenticator) UserSignIn(ctx context.Context, email, password string, 
 	}
 
 	return a.GenerateAccessToken(ctx, *user, duration)
+}
+
+func (a *Authenticator) GetUserByID(ctx context.Context, userID string) (targetUser *entity.User, err error) {
+	return a.userRepository.GetUserByID(ctx, userID)
 }

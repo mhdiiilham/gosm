@@ -336,3 +336,21 @@ func (r *EventRepository) UpdateGuestAttendingStatus(ctx context.Context, guestS
 
 	return nil
 }
+
+// DeleteEvent soft delete an event based on it given uuid.
+func (r *EventRepository) DeleteEvent(ctx context.Context, eventUUID string) (bool, error) {
+	result, err := r.db.ExecContext(ctx, SQLStatementDeleteEvent, eventUUID)
+	if err != nil {
+		logger.Errorf(ctx, "EventRepository.DeleteEvent", "failed to delete event: %v", err)
+		return false, err
+	}
+
+	// ignore result and error.
+	_, err = r.db.ExecContext(ctx, SQLStatementDeleteEventGuests, eventUUID)
+	if err != nil {
+		logger.Errorf(ctx, "EventRepository.DeleteEvent", "failed to remove guests from event: %v", err)
+	}
+
+	rowAffected, _ := result.RowsAffected()
+	return int(rowAffected) != 0, nil
+}

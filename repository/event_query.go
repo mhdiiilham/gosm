@@ -199,4 +199,24 @@ var (
 				qr_code_identifier = $3
 		WHERE guest_uuid = $4;
 	`
+
+	// SQLStatementUpdateGuestArrived update guest is_arrived
+	SQLStatementUpdateGuestArrived = `
+		UPDATE event_user_guests
+			SET is_arrived = $1,
+		WHERE short_id = $2;
+	`
+
+	// SQLStatementDeleteEvent soft delete an events.
+	SQLStatementDeleteEvent = `
+		UPDATE events
+			SET deleted_at = now()
+		WHERE events.uuid = $1;
+	`
+
+	// SQLStatementDeleteEventGuests delete guest from events.
+	SQLStatementDeleteEventGuests = `
+		DELETE FROM event_user_guests
+		WHERE event_user_guests.event_uuid = $1;
+	`
 )

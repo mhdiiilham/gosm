@@ -27,4 +27,23 @@ var (
 		WHERE email = $1 AND deleted_at IS NULL
 		LIMIT 1;
 	`
+
+	// SQLStatementSelectUserByID is an SQL query to retrieve a user by ID.
+	// It selects the user's ID, name, role, email, and hashed password.
+	// The query excludes soft-deleted users by checking if deleted_at IS NULL.
+	// Only one user is returned due to the LIMIT 1 clause.
+	SQLStatementSelectUserByID = `
+		SELECT
+			id,
+			first_name,
+			last_name,
+			role,
+			email,
+			password,
+			phone_number,
+			country_code
+		FROM "users"
+		WHERE id = $1 AND deleted_at IS NULL
+		LIMIT 1;
+	`
 )

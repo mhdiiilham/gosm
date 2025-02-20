@@ -29,6 +29,19 @@ type Middleware struct {
 	userRepository UserRepository
 }
 
+var (
+	// AllowedSuperAdminOnly only allow super admin to access this endpoint.
+	AllowedSuperAdminOnly = []entity.UserRole{entity.UserRoleSuperAdmin}
+
+	// AllowedAuthenticatedOnly only allow requet with valid access token.
+	AllowedAuthenticatedOnly = []entity.UserRole{
+		entity.UserRoleSuperAdmin,
+		entity.UserRoleOrganizer,
+		entity.UserRoleHost,
+		entity.UserRoleGuest,
+	}
+)
+
 // NewMiddleware initializes a new Middleware instance with the provided JWT service and user repository.
 func NewMiddleware(jwtService JwtGenerator, userRepository UserRepository) *Middleware {
 	return &Middleware{jwtService: jwtService, userRepository: userRepository}

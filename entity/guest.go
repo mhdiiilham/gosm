@@ -21,6 +21,7 @@ type Guest struct {
 	WillAttendEvent  *bool   `json:"will_attend_event"`
 	QRCodeIdentifier *string `json:"qr_code_identifier"`
 	IsInvitationSent *bool   `json:"is_invitation_sent"`
+	IsArrived        bool    `json:"is_arrived"`
 }
 
 // GenerateQRCodeIdentifier generate a json string that encoded to base64.

@@ -24,17 +24,17 @@ var (
 
 // User represents a user entity with personal and contact information.
 type User struct {
-	ID          string     `db:"id"`
-	FirstName   string     `db:"first_name"`
-	LastName    *string    `db:"last_name"`
-	Role        UserRole   `db:"role"`
-	Email       string     `db:"email"`
-	Password    string     `db:"password"`
-	CountryCode *string    `db:"country_ode"`
-	PhoneNumber *string    `db:"phone_umber"`
-	CreatedAt   time.Time  `db:"created_at"`
-	UpdatedAt   time.Time  `db:"updated_at"`
-	DeletedAt   *time.Time `db:"deleted_at"`
+	ID          string     `json:"id" db:"id"`
+	FirstName   string     `json:"first_name" db:"first_name"`
+	LastName    *string    `json:"last_name" db:"last_name"`
+	Role        UserRole   `json:"role" db:"role"`
+	Email       string     `json:"email" db:"email"`
+	Password    string     `json:"-" db:"password"`
+	CountryCode *string    `json:"country_code" db:"country_ode"`
+	PhoneNumber *string    `json:"phone_number" db:"phone_umber"`
+	CreatedAt   time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at" db:"updated_at"`
+	DeletedAt   *time.Time `json:"-" db:"deleted_at"`
 }
 
 // GetName returns the full name of the user.

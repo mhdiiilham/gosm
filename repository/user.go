@@ -66,3 +66,24 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 
 	return &existingUser, nil
 }
+
+// GetUserByID retrieves a user from the database based on their id.
+func (r *UserRepository) GetUserByID(ctx context.Context, userID string) (targetUser *entity.User, err error) {
+	targetUser = &entity.User{}
+
+	row := r.db.QueryRowContext(ctx, SQLStatementSelectUserByID, userID)
+	if err := row.Scan(
+		&targetUser.ID,
+		&targetUser.FirstName,
+		&targetUser.LastName,
+		&targetUser.Role,
+		&targetUser.Email,
+		&targetUser.Password,
+		&targetUser.PhoneNumber,
+		&targetUser.CountryCode,
+	); err != nil {
+		return nil, err
+	}
+
+	return targetUser, nil
+}

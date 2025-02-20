@@ -1,0 +1,721 @@
+basePath: /api/v1
+definitions:
+  delivery.AccessTokenResponse:
+    properties:
+      access_token:
+        type: string
+      email:
+        type: string
+      expires_at:
+        type: string
+      role:
+        type: string
+    type: object
+  delivery.AddGuestRequest:
+    properties:
+      guests:
+        items:
+          $ref: '#/definitions/delivery.GuestDetail'
+        type: array
+    type: object
+  delivery.CreateEventRequest:
+    properties:
+      digital_invitation_url:
+        type: string
+      end_date:
+        type: string
+      host:
+        type: string
+      location:
+        type: string
+      message_template:
+        type: string
+      name:
+        type: string
+      start_date:
+        type: string
+    type: object
+  delivery.GuestDetail:
+    properties:
+      guest_uuid:
+        type: string
+      is_vip:
+        type: boolean
+      name:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  delivery.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      error: {}
+      message:
+        type: string
+    type: object
+  delivery.SignInRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      remember:
+        type: boolean
+    type: object
+  delivery.UpdateGuestAttendingAndMessage:
+    properties:
+      is_attending:
+        type: boolean
+      message:
+        type: string
+      short_id:
+        type: string
+    type: object
+  entity.Event:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      digital_invitation_url:
+        type: string
+      end_date:
+        type: string
+      guest_list:
+        items:
+          $ref: '#/definitions/entity.Guest'
+        type: array
+      host:
+        type: string
+      id:
+        type: string
+      location:
+        type: string
+      message_template:
+        type: string
+      name:
+        type: string
+      start_date:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
+  entity.Guest:
+    properties:
+      is_arrived:
+        type: boolean
+      is_invitation_sent:
+        type: boolean
+      is_vip:
+        type: boolean
+      message:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      qr_code_identifier:
+        type: string
+      short_id:
+        type: string
+      uuid:
+        type: string
+      will_attend_event:
+        type: boolean
+    type: object
+  entity.PaginationResponse:
+    properties:
+      lastPage:
+        type: integer
+      page:
+        type: integer
+      per_page:
+        type: integer
+      records: {}
+      total_records:
+        type: integer
+    type: object
+  entity.User:
+    properties:
+      country_code:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      phone_number:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: gosm.muhammadilham.xyz
+info:
+  contact:
+    email: hi@muhammadilham.xyz
+    name: API Support
+    url: https://pumbook.muhammadilham.xyz
+  description: A guest management system that is written in Go.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: GoSM
+  version: "1.0"
+paths:
+  /api/v1/auth:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User sign-in credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User successfully authenticated
+          schema:
+            allOf:
+            - $ref: '#/definitions/delivery.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/delivery.AccessTokenResponse'
+              type: object
+        "400":
+          description: Invalid credentials or bad request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      summary: Authenticate user and return access token
+      tags:
+      - auth
+  /api/v1/auth/profile:
+    get:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/delivery.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.User'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      summary: get logged user's profile.
+      tags:
+      - auth
+  /api/v1/auth/signup:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User sign-up credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/delivery.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/delivery.AccessTokenResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      summary: Register a new user
+      tags:
+      - auth
+  /api/v1/public/guests:
+    get:
+      consumes:
+      - application/json
+      description: Fetches guest information without requiring authentication.
+      parameters:
+      - description: Guest Short ID
+        in: query
+        name: short_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved guest
+          schema:
+            allOf:
+            - $ref: '#/definitions/delivery.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Guest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "404":
+          description: Guest not found
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      summary: Get guest by short ID
+      tags:
+      - guests
+    post:
+      consumes:
+      - application/json
+      description: Allows guests to update their attending status using a short ID.
+      parameters:
+      - description: Guest attending status update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.UpdateGuestAttendingAndMessage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated guest status
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      summary: Update guest attending status
+      tags:
+      - guests
+  /events:
+    get:
+      consumes:
+      - application/json
+      description: Fetches a paginated list of events for the authenticated user.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Event name
+        in: query
+        name: name
+        type: string
+      - description: Event host
+        in: query
+        name: host
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Items per page (default: 10)'
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/delivery.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/entity.PaginationResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/definitions/entity.Event'
+                        type: array
+                    type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      security:
+      - BearerAuth: []
+      summary: Get list of events
+      tags:
+      - events
+    post:
+      consumes:
+      - application/json
+      description: Creates a new event for the authenticated user.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Event creation payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.CreateEventRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/delivery.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Event'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      security:
+      - BearerAuth: []
+      summary: Create an event
+      tags:
+      - events
+  /events/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Allows only super admins to delete an event.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Event UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Event deleted successfully
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "403":
+          description: Forbidden - Only super admins allowed
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete an event
+      tags:
+      - events
+    get:
+      consumes:
+      - application/json
+      description: Fetches event details for the authenticated user.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Event UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/delivery.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Event'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "404":
+          description: Event Not Found
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      security:
+      - BearerAuth: []
+      summary: Get an event
+      tags:
+      - events
+    patch:
+      consumes:
+      - application/json
+      description: Allows authenticated users to update event details.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Event UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Event update payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.CreateEventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Event updated successfully
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      security:
+      - BearerAuth: []
+      summary: Update an event
+      tags:
+      - events
+  /events/{uuid}/guests:
+    post:
+      consumes:
+      - application/json
+      description: Allows authenticated users to add multiple guests to a specific
+        event.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Event UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: List of guests to be added
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.AddGuestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message with number of guests added
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      security:
+      - BearerAuth: []
+      summary: Add guests to an event
+      tags:
+      - events
+  /events/{uuid}/guests/{guest_uuid}/invite:
+    post:
+      consumes:
+      - application/json
+      description: Allows authenticated users to send invitations to guests for an
+        event.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Event UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Guest UUID
+        in: path
+        name: guest_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Invitation sent successfully
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      security:
+      - BearerAuth: []
+      summary: Send guest invitation
+      tags:
+      - invitations
+  /events/guests:
+    delete:
+      consumes:
+      - application/json
+      description: Allows authenticated users to remove multiple guests from a specific
+        event.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: List of guests to be deleted (UUIDs required)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.AddGuestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Guests successfully removed
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete guests from an event
+      tags:
+      - events
+  /guests/{guest_uuid}:
+    patch:
+      consumes:
+      - application/json
+      description: Allows authenticated users to change a guest's VIP status.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Guest UUID
+        in: path
+        name: guest_uuid
+        required: true
+        type: string
+      - description: VIP status (true/false)
+        in: query
+        name: is_vip
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Guest VIP status updated successfully
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      security:
+      - BearerAuth: []
+      summary: Update guest VIP status
+      tags:
+      - guests
+swagger: "2.0"

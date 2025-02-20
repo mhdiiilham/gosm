@@ -24,6 +24,7 @@ type EventService interface {
 	SendGuestInvitation(ctx context.Context, userID, eventUUID, guestUUID string) (status string, err error)
 	GetGuestByShortID(ctx context.Context, guestShortID string) (guest *entity.Guest, err error)
 	UpdateGuestAttendingStatus(ctx context.Context, guestShortID string, isAttending bool, message string) (err error)
+	DeleteEvent(ctx context.Context, eventUUID string) (success bool, err error)
 }
 
 // EventHandler handles HTTP requests related to event operations.
@@ -44,6 +45,7 @@ func (h *EventHandler) RegisterEventRoutes(e *echo.Group, middleware *Middleware
 	eventDetailGrouped := e.Group("/:uuid")
 	eventDetailGrouped.GET("", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer, entity.UserRoleGuest}, h.handleGetEvent))
 	eventDetailGrouped.PATCH("", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer, entity.UserRoleGuest}, h.handleUpdateEvent))
+	eventDetailGrouped.DELETE("", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin}, h.handleDeleteEvent))
 
 	eventDetailedGuestGrouped := eventDetailGrouped.Group("/guests")
 	eventDetailedGuestGrouped.POST("", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer}, h.handleAddGuestToEvent))
@@ -52,6 +54,18 @@ func (h *EventHandler) RegisterEventRoutes(e *echo.Group, middleware *Middleware
 	eventDetailedGuestGrouped.POST("/:guest_uuid/invite", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer}, h.handleSentInvitation))
 }
 
+//	@Summary		Create an event
+//	@Description	Creates a new event for the authenticated user.
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			Authorization	header		string				true	"Bearer Token"
+//	@Param			request			body		CreateEventRequest	true	"Event creation payload"
+//	@Success		201				{object}	Response{data=entity.Event}
+//	@Failure		400				{object}	Response	"Bad Request"
+//	@Failure		500				{object}	Response	"Internal Server Error"
+//	@Router			/events [post]
 func (h *EventHandler) handleCreateEvent(c echo.Context) error {
 	ctx := c.Request().Context()
 	const ops = "EventHandler.handleCreateEvent"
@@ -103,6 +117,21 @@ func (h *EventHandler) handleCreateEvent(c echo.Context) error {
 	})
 }
 
+// handleGetEvent retrieves an event by UUID.
+//
+//	@Summary		Get an event
+//	@Description	Fetches event details for the authenticated user.
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			Authorization	header		string	true	"Bearer Token"
+//	@Param			uuid			path		string	true	"Event UUID"
+//	@Success		200				{object}	Response{data=entity.Event}
+//	@Failure		400				{object}	Response	"Bad Request"
+//	@Failure		404				{object}	Response	"Event Not Found"
+//	@Failure		500				{object}	Response	"Internal Server Error"
+//	@Router			/events/{uuid} [get]
 func (h *EventHandler) handleGetEvent(c echo.Context) error {
 	ctx := c.Request().Context()
 	eventUUID := c.Param("uuid")
@@ -142,6 +171,23 @@ func (h *EventHandler) handleGetEvent(c echo.Context) error {
 	})
 }
 
+// handleGetEvents retrieves a paginated list of events for the authenticated user.
+//
+//	@Summary		Get list of events
+//	@Description	Fetches a paginated list of events for the authenticated user.
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			Authorization	header		string	true	"Bearer Token"
+//	@Param			name			query		string	false	"Event name"
+//	@Param			host			query		string	false	"Event host"
+//	@Param			page			query		int		false	"Page number (default: 1)"
+//	@Param			per_page		query		int		false	"Items per page (default: 10)"
+//	@Success		200				{object}	Response{data=entity.PaginationResponse{data=[]entity.Event}}
+//	@Failure		400				{object}	Response	"Bad Request"
+//	@Failure		500				{object}	Response	"Internal Server Error"
+//	@Router			/events [get]
 func (h *EventHandler) handleGetEvents(c echo.Context) error {
 	ctx := c.Request().Context()
 	userID := c.Get("user_id").(string)
@@ -198,6 +244,21 @@ func (h *EventHandler) handleGetEvents(c echo.Context) error {
 	})
 }
 
+// handleAddGuestToEvent adds guests to an event.
+//
+//	@Summary		Add guests to an event
+//	@Description	Allows authenticated users to add multiple guests to a specific event.
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			Authorization	header		string			true	"Bearer Token"
+//	@Param			uuid			path		string			true	"Event UUID"
+//	@Param			request			body		AddGuestRequest	true	"List of guests to be added"
+//	@Success		200				{object}	Response		"Success message with number of guests added"
+//	@Failure		400				{object}	Response		"Bad Request"
+//	@Failure		500				{object}	Response		"Internal Server Error"
+//	@Router			/events/{uuid}/guests [post]
 func (h *EventHandler) handleAddGuestToEvent(c echo.Context) error {
 	var request AddGuestRequest
 	ctx := c.Request().Context()
@@ -247,6 +308,20 @@ func (h *EventHandler) handleAddGuestToEvent(c echo.Context) error {
 	})
 }
 
+// handleDeleteGuests removes guests from an event.
+//
+//	@Summary		Delete guests from an event
+//	@Description	Allows authenticated users to remove multiple guests from a specific event.
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			Authorization	header		string			true	"Bearer Token"
+//	@Param			request			body		AddGuestRequest	true	"List of guests to be deleted (UUIDs required)"
+//	@Success		200				{object}	Response		"Guests successfully removed"
+//	@Failure		400				{object}	Response		"Bad Request"
+//	@Failure		500				{object}	Response		"Internal Server Error"
+//	@Router			/events/guests [delete]
 func (h *EventHandler) handleDeleteGuests(c echo.Context) error {
 	var request AddGuestRequest
 	ctx := c.Request().Context()
@@ -268,6 +343,21 @@ func (h *EventHandler) handleDeleteGuests(c echo.Context) error {
 	return c.JSON(http.StatusOK, Response{StatusCode: http.StatusOK, Message: "ok"})
 }
 
+// handleUpdateGuestVIPStatus updates the VIP status of a guest.
+//
+//	@Summary		Update guest VIP status
+//	@Description	Allows authenticated users to change a guest's VIP status.
+//	@Tags			guests
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			Authorization	header		string		true	"Bearer Token"
+//	@Param			guest_uuid		path		string		true	"Guest UUID"
+//	@Param			is_vip			query		boolean		true	"VIP status (true/false)"
+//	@Success		200				{object}	Response	"Guest VIP status updated successfully"
+//	@Failure		400				{object}	Response	"Bad Request"
+//	@Failure		500				{object}	Response	"Internal Server Error"
+//	@Router			/guests/{guest_uuid} [patch]
 func (h *EventHandler) handleUpdateGuestVIPStatus(c echo.Context) error {
 	ctx := c.Request().Context()
 	isVIPQueryParam := c.QueryParam("is_vip")
@@ -282,6 +372,21 @@ func (h *EventHandler) handleUpdateGuestVIPStatus(c echo.Context) error {
 	return c.JSON(http.StatusOK, Response{StatusCode: http.StatusOK, Message: "ok"})
 }
 
+// handleUpdateEvent updates an existing event.
+//
+//	@Summary		Update an event
+//	@Description	Allows authenticated users to update event details.
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			Authorization	header		string				true	"Bearer Token"
+//	@Param			uuid			path		string				true	"Event UUID"
+//	@Param			body			body		CreateEventRequest	true	"Event update payload"
+//	@Success		200				{object}	Response			"Event updated successfully"
+//	@Failure		400				{object}	Response			"Bad Request"
+//	@Failure		500				{object}	Response			"Internal Server Error"
+//	@Router			/events/{uuid} [patch]
 func (h *EventHandler) handleUpdateEvent(c echo.Context) error {
 	eventUUID := c.Param("uuid")
 	ctx := c.Request().Context()
@@ -307,6 +412,21 @@ func (h *EventHandler) handleUpdateEvent(c echo.Context) error {
 	return c.JSON(http.StatusOK, Response{StatusCode: http.StatusOK, Message: "updated!"})
 }
 
+// handleSentInvitation sends an invitation to a guest for a specific event.
+//
+//	@Summary		Send guest invitation
+//	@Description	Allows authenticated users to send invitations to guests for an event.
+//	@Tags			invitations
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			Authorization	header		string		true	"Bearer Token"
+//	@Param			uuid			path		string		true	"Event UUID"
+//	@Param			guest_uuid		path		string		true	"Guest UUID"
+//	@Success		200				{object}	Response	"Invitation sent successfully"
+//	@Failure		400				{object}	Response	"Bad Request"
+//	@Failure		500				{object}	Response	"Internal Server Error"
+//	@Router			/events/{uuid}/guests/{guest_uuid}/invite [post]
 func (h *EventHandler) handleSentInvitation(c echo.Context) error {
 	guestUUID := c.Param("guest_uuid")
 	eventUUID := c.Param("uuid")
@@ -333,6 +453,50 @@ func (h *EventHandler) handleSentInvitation(c echo.Context) error {
 	return c.JSON(http.StatusOK, Response{
 		StatusCode: http.StatusOK,
 		Message:    fmt.Sprintf("Invitation sent, status: %s", status),
+		Data:       nil,
+		Error:      nil,
+	})
+}
+
+// handleDeleteEvent deletes an event.
+//
+//	@Summary		Delete an event
+//	@Description	Allows only super admins to delete an event.
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			Authorization	header		string		true	"Bearer Token"
+//	@Param			uuid			path		string		true	"Event UUID"
+//	@Success		200				{object}	Response	"Event deleted successfully"
+//	@Failure		400				{object}	Response	"Bad Request"
+//	@Failure		403				{object}	Response	"Forbidden - Only super admins allowed"
+//	@Failure		500				{object}	Response	"Internal Server Error"
+//	@Router			/events/{uuid} [delete]
+func (h *EventHandler) handleDeleteEvent(c echo.Context) error {
+	eventUUID := c.Param("uuid")
+	ctx := c.Request().Context()
+
+	success, err := h.eventService.DeleteEvent(ctx, eventUUID)
+	if err != nil {
+		switch parsedErr := err.(type) {
+		case entity.GosmError:
+			if parsedErr.Type == entity.GosmErrorTypeBadRequest {
+				return c.JSON(http.StatusBadRequest, Response{
+					StatusCode: http.StatusBadRequest,
+					Message:    parsedErr.Message,
+					Data:       nil,
+					Error:      parsedErr.Source,
+				})
+			}
+		}
+
+		return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
+	}
+
+	return c.JSON(http.StatusOK, Response{
+		StatusCode: http.StatusOK,
+		Message:    fmt.Sprintf("Success delete event %s: %v", eventUUID, success),
 		Data:       nil,
 		Error:      nil,
 	})

@@ -8,7 +8,19 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// GetGuestByItShortID public handle to retrieve guest information without any authentication.
+// GetGuestByItShortID retrieves guest information using a short ID.
+//
+//	@Summary		Get guest by short ID
+//	@Description	Fetches guest information without requiring authentication.
+//	@Tags			guests
+//	@Accept			json
+//	@Produce		json
+//	@Param			short_id	query		string						true	"Guest Short ID"
+//	@Success		200			{object}	Response{data=entity.Guest}	"Successfully retrieved guest"
+//	@Failure		400			{object}	Response					"Bad Request"
+//	@Failure		404			{object}	Response					"Guest not found"
+//	@Failure		500			{object}	Response					"Internal Server Error"
+//	@Router			/api/v1/public/guests [get]
 func GetGuestByItShortID(srv EventService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		guestShortID := c.QueryParam("short_id")
@@ -28,11 +40,20 @@ func GetGuestByItShortID(srv EventService) echo.HandlerFunc {
 	}
 }
 
-// UpdateGuestAttendingFromInvitation public handle updating guest's attending status.
+// UpdateGuestAttendingFromInvitation updates a guest's attending status.
+//
+//	@Summary		Update guest attending status
+//	@Description	Allows guests to update their attending status using a short ID.
+//	@Tags			guests
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		UpdateGuestAttendingAndMessage	true	"Guest attending status update request"
+//	@Success		200		{object}	Response						"Successfully updated guest status"
+//	@Failure		400		{object}	Response						"Bad Request"
+//	@Failure		500		{object}	Response						"Internal Server Error"
+//	@Router			/api/v1/public/guests [post]
 func UpdateGuestAttendingFromInvitation(srv EventService) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// guestShortID := c.QueryParam("short_id")
-		// isAttending, _ := strconv.ParseBool(c.QueryParam("attending"))
 		var request UpdateGuestAttendingAndMessage
 		if err := c.Bind(&request); err != nil {
 			return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
