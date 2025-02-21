@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.16.0](https://github.com/mhdiiilham/gosm/compare/v1.15.1...v1.16.0) (2025-02-21)
+
+
+### Features
+
+* parse phone number ([072434a](https://github.com/mhdiiilham/gosm/commit/072434a5a1532f27b251a3fb2069525a5b16076d))
+
 ## [1.15.1](https://github.com/mhdiiilham/gosm/compare/v1.15.0...v1.15.1) (2025-02-21)
 
 
