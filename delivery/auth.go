@@ -89,12 +89,15 @@ func (h *AuthHandler) HandleSignUp(c echo.Context) error {
 		})
 	}
 
+	fmt.Printf("payload: %+v\n", requestBody)
+	countryCode, localNumber, _ := entity.ParsePhoneNumber(requestBody.PhoneNumber)
+
 	toCreateUser := entity.User{
 		FirstName:   requestBody.FirstName,
 		LastName:    &requestBody.LastName,
 		Email:       requestBody.Email,
-		CountryCode: pointer.To("+62"), // Hardcoded this cause it's only Indo, lol
-		PhoneNumber: &requestBody.PhoneNumber,
+		CountryCode: pointer.To(countryCode), // Hardcoded this cause it's only Indo, lol
+		PhoneNumber: pointer.To(localNumber),
 		Password:    requestBody.Password,
 		Role:        entity.UserRole(requestBody.Role),
 	}

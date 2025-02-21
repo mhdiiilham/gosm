@@ -110,7 +110,7 @@ func (r *EventRepository) GetEvents(ctx context.Context, userID string, limit, o
 		return nil, 0, err
 	}
 
-	var events []entity.Event
+	events := []entity.Event{}
 	for rows.Next() {
 		event := entity.Event{}
 		if err := rows.Scan(
