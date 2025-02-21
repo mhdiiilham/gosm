@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.15.1](https://github.com/mhdiiilham/gosm/compare/v1.15.0...v1.15.1) (2025-02-21)
+
+
+### Bug Fixes
+
+* **checkin:** SQL statement error ([ecfb1de](https://github.com/mhdiiilham/gosm/commit/ecfb1de5a5923368a92b1d5b734e51ea38d160c9))
+
 # [1.15.0](https://github.com/mhdiiilham/gosm/compare/v1.14.0...v1.15.0) (2025-02-21)
 
 
