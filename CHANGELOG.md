@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [1.15.0](https://github.com/mhdiiilham/gosm/compare/v1.14.0...v1.15.0) (2025-02-21)
+
+
+### Features
+
+* added field  to entity Event ([a786f11](https://github.com/mhdiiilham/gosm/commit/a786f113da531a42820aef07c5a6ebdf378450a1))
+* **events:** provide endpoint to set guest to arrived ([b0b0804](https://github.com/mhdiiilham/gosm/commit/b0b080464dff0e7016964d9b7be6e5b6a39ca276))
+
 # [1.14.0](https://github.com/mhdiiilham/gosm/compare/v1.13.0...v1.14.0) (2025-02-20)
 
 
