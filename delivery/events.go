@@ -50,24 +50,24 @@ func (h *EventHandler) RegisterEventRoutes(e *echo.Group, middleware *Middleware
 
 	eventDetailedGuestGrouped := eventDetailGrouped.Group("/guests")
 	eventDetailedGuestGrouped.POST("", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleAddGuestToEvent))
-	eventDetailGrouped.POST("/arrived", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleUpdateGuestArrived))
+	eventDetailedGuestGrouped.POST("/arrived", h.handleUpdateGuestArrived)
 	eventDetailedGuestGrouped.DELETE("", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleDeleteGuests))
 	eventDetailedGuestGrouped.PATCH("/:guest_uuid", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleUpdateGuestVIPStatus))
 	eventDetailedGuestGrouped.POST("/:guest_uuid/invite", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleSentInvitation))
 }
 
-//	@Summary		Create an event
-//	@Description	Creates a new event for the authenticated user.
-//	@Tags			events
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerAuth
-//	@Param			Authorization	header		string				true	"Bearer Token"
-//	@Param			request			body		CreateEventRequest	true	"Event creation payload"
-//	@Success		201				{object}	Response{data=entity.Event}
-//	@Failure		400				{object}	Response	"Bad Request"
-//	@Failure		500				{object}	Response	"Internal Server Error"
-//	@Router			/events [post]
+// @Summary		Create an event
+// @Description	Creates a new event for the authenticated user.
+// @Tags			events
+// @Accept			json
+// @Produce		json
+// @Security		BearerAuth
+// @Param			Authorization	header		string				true	"Bearer Token"
+// @Param			request			body		CreateEventRequest	true	"Event creation payload"
+// @Success		201				{object}	Response{data=entity.Event}
+// @Failure		400				{object}	Response	"Bad Request"
+// @Failure		500				{object}	Response	"Internal Server Error"
+// @Router			/events [post]
 func (h *EventHandler) handleCreateEvent(c echo.Context) error {
 	ctx := c.Request().Context()
 	const ops = "EventHandler.handleCreateEvent"

@@ -206,7 +206,7 @@ var (
 	// SQLStatementUpdateGuestArrived update guest is_arrived
 	SQLStatementUpdateGuestArrived = `
 		UPDATE event_user_guests
-			SET is_arrived = $1,
+			SET is_arrived = $1
 		WHERE short_id = $2;
 	`
 
