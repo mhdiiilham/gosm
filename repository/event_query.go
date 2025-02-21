@@ -13,9 +13,10 @@ var (
 			end_date,
 			digital_invitation_url,
 			host,
-			message_template
+			message_template,
+			event_type
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING "id";
 	`
 
@@ -28,8 +29,9 @@ var (
 				end_date = $4,
 				digital_invitation_url = $5,
 				host = $6,
-				message_template = $7
-		WHERE events.uuid = $8;
+				message_template = $7,
+				event_type = $8
+		WHERE events.uuid = $9;
 	`
 
 	// SQLStatementSelectEvents retrieves a paginated list of events from the "events" table.
@@ -81,7 +83,8 @@ var (
 			created_at,
 			updated_at,
 			host,
-			message_template
+			message_template,
+			event_type
 		FROM events
 		JOIN event_user_organizers ON events.id = event_user_organizers.event_id
 		WHERE deleted_at IS NULL

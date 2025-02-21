@@ -933,6 +933,9 @@ const docTemplate = `{
                 "end_date": {
                     "type": "string"
                 },
+                "event_type": {
+                    "type": "string"
+                },
                 "host": {
                     "type": "string"
                 },
@@ -1021,6 +1024,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "end_date": {
+                    "type": "string"
+                },
+                "event_type": {
                     "type": "string"
                 },
                 "guest_list": {

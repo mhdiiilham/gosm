@@ -53,6 +53,7 @@ func (r *EventRepository) CreateEvent(ctx context.Context, userID string, event 
 		event.DigitalInvitationURL,
 		event.Host,
 		event.MessageTemplate,
+		event.EventType,
 	)
 
 	if err := row.Scan(&event.ID); err != nil {
@@ -85,6 +86,7 @@ func (r *EventRepository) GetEvent(ctx context.Context, tx *sql.Tx, userID, UUID
 		&event.UpdatedAt,
 		&event.Host,
 		&event.MessageTemplate,
+		&event.EventType,
 	); err != nil {
 		return nil, err
 	}
@@ -268,6 +270,7 @@ func (r *EventRepository) UpdateEvent(ctx context.Context, event entity.Event) (
 		event.DigitalInvitationURL,
 		event.Host,
 		event.MessageTemplate,
+		event.EventType,
 		event.UUID,
 	)
 	if err != nil {

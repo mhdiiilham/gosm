@@ -39,33 +39,33 @@ func NewEventHandler(service EventService) *EventHandler {
 
 // RegisterEventRoutes registers the event-related routes within the Echo router group.
 func (h *EventHandler) RegisterEventRoutes(e *echo.Group, middleware *Middleware) {
-	e.GET("", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer, entity.UserRoleGuest}, h.handleGetEvents))
-	e.POST("", middleware.AuthMiddleware([]entity.UserRole{"super_admin"}, h.handleCreateEvent))
+	e.GET("", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleGetEvents))
+	e.POST("", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleCreateEvent))
 
 	eventDetailGrouped := e.Group("/:uuid")
-	eventDetailGrouped.GET("", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer, entity.UserRoleGuest}, h.handleGetEvent))
-	eventDetailGrouped.PATCH("", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer, entity.UserRoleGuest}, h.handleUpdateEvent))
-	eventDetailGrouped.DELETE("", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin}, h.handleDeleteEvent))
+	eventDetailGrouped.GET("", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleGetEvent))
+	eventDetailGrouped.PATCH("", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleUpdateEvent))
+	eventDetailGrouped.DELETE("", middleware.AuthMiddleware(AllowedSuperAdminOnly, h.handleDeleteEvent))
 
 	eventDetailedGuestGrouped := eventDetailGrouped.Group("/guests")
-	eventDetailedGuestGrouped.POST("", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer}, h.handleAddGuestToEvent))
-	eventDetailedGuestGrouped.DELETE("", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer}, h.handleDeleteGuests))
-	eventDetailedGuestGrouped.PATCH("/:guest_uuid", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer}, h.handleUpdateGuestVIPStatus))
-	eventDetailedGuestGrouped.POST("/:guest_uuid/invite", middleware.AuthMiddleware([]entity.UserRole{entity.UserRoleSuperAdmin, entity.UserRoleHost, entity.UserRoleOrganizer}, h.handleSentInvitation))
+	eventDetailedGuestGrouped.POST("", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleAddGuestToEvent))
+	eventDetailedGuestGrouped.DELETE("", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleDeleteGuests))
+	eventDetailedGuestGrouped.PATCH("/:guest_uuid", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleUpdateGuestVIPStatus))
+	eventDetailedGuestGrouped.POST("/:guest_uuid/invite", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleSentInvitation))
 }
 
-//	@Summary		Create an event
-//	@Description	Creates a new event for the authenticated user.
-//	@Tags			events
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerAuth
-//	@Param			Authorization	header		string				true	"Bearer Token"
-//	@Param			request			body		CreateEventRequest	true	"Event creation payload"
-//	@Success		201				{object}	Response{data=entity.Event}
-//	@Failure		400				{object}	Response	"Bad Request"
-//	@Failure		500				{object}	Response	"Internal Server Error"
-//	@Router			/events [post]
+// @Summary		Create an event
+// @Description	Creates a new event for the authenticated user.
+// @Tags			events
+// @Accept			json
+// @Produce		json
+// @Security		BearerAuth
+// @Param			Authorization	header		string				true	"Bearer Token"
+// @Param			request			body		CreateEventRequest	true	"Event creation payload"
+// @Success		201				{object}	Response{data=entity.Event}
+// @Failure		400				{object}	Response	"Bad Request"
+// @Failure		500				{object}	Response	"Internal Server Error"
+// @Router			/events [post]
 func (h *EventHandler) handleCreateEvent(c echo.Context) error {
 	ctx := c.Request().Context()
 	const ops = "EventHandler.handleCreateEvent"
@@ -86,6 +86,7 @@ func (h *EventHandler) handleCreateEvent(c echo.Context) error {
 	createdEvent, serviceErr := h.eventService.CreateEvent(ctx, userID, entity.Event{
 		Name:                 request.Name,
 		Host:                 pointer.ToString(request.Host),
+		EventType:            entity.ParseEventType(request.EventType),
 		Location:             request.Location,
 		StartDate:            request.StartDate,
 		EndDate:              request.EndDate,
@@ -400,6 +401,7 @@ func (h *EventHandler) handleUpdateEvent(c echo.Context) error {
 		UUID:                 eventUUID,
 		Name:                 request.Name,
 		Host:                 pointer.ToString(request.Host),
+		EventType:            entity.ParseEventType(request.EventType),
 		Location:             request.Location,
 		StartDate:            request.StartDate,
 		EndDate:              request.EndDate,

@@ -24,6 +24,8 @@ definitions:
         type: string
       end_date:
         type: string
+      event_type:
+        type: string
       host:
         type: string
       location:
@@ -82,6 +84,8 @@ definitions:
       digital_invitation_url:
         type: string
       end_date:
+        type: string
+      event_type:
         type: string
       guest_list:
         items:

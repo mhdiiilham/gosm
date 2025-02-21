@@ -4,6 +4,7 @@ package delivery
 type CreateEventRequest struct {
 	Name                 string `json:"name"`
 	Host                 string `json:"host"`
+	EventType            string `json:"event_type"`
 	Location             string `json:"location"`
 	StartDate            string `json:"start_date"`
 	EndDate              string `json:"end_date"`

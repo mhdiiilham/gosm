@@ -927,6 +927,9 @@
                 "end_date": {
                     "type": "string"
                 },
+                "event_type": {
+                    "type": "string"
+                },
                 "host": {
                     "type": "string"
                 },
@@ -1015,6 +1018,9 @@
                     "type": "string"
                 },
                 "end_date": {
+                    "type": "string"
+                },
+                "event_type": {
                     "type": "string"
                 },
                 "guest_list": {
