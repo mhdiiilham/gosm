@@ -762,6 +762,57 @@
                 }
             }
         },
+        "/events/{uuid}/guests/arrived": {
+            "post": {
+                "description": "Updates the arrival status of a guest using their short ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Guests"
+                ],
+                "summary": "Update guest arrival status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Guest Short ID",
+                        "name": "short_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Arrival status (true/false)",
+                        "name": "is_arrived",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Guest arrival status updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request (invalid guest ID or parameters)",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/events/{uuid}/guests/{guest_uuid}/invite": {
             "post": {
                 "security": [

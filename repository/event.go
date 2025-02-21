@@ -357,3 +357,13 @@ func (r *EventRepository) DeleteEvent(ctx context.Context, eventUUID string) (bo
 	rowAffected, _ := result.RowsAffected()
 	return int(rowAffected) != 0, nil
 }
+
+// SetGuestIsArrived update an guest `is_arrived`
+func (r *EventRepository) SetGuestIsArrived(ctx context.Context, guestShortID string, isArrived bool) (err error) {
+	_, err = r.db.ExecContext(ctx, SQLStatementUpdateGuestArrived, isArrived, guestShortID)
+	if err != nil {
+		logger.Errorf(ctx, "EventRepository.DeleteEvent", "failed to update guest is_arrived: %v", err)
+	}
+
+	return nil
+}

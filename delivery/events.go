@@ -25,6 +25,7 @@ type EventService interface {
 	GetGuestByShortID(ctx context.Context, guestShortID string) (guest *entity.Guest, err error)
 	UpdateGuestAttendingStatus(ctx context.Context, guestShortID string, isAttending bool, message string) (err error)
 	DeleteEvent(ctx context.Context, eventUUID string) (success bool, err error)
+	SetGuestIsArrived(ctx context.Context, guestShortID string, isArrived bool) (err error)
 }
 
 // EventHandler handles HTTP requests related to event operations.
@@ -49,23 +50,24 @@ func (h *EventHandler) RegisterEventRoutes(e *echo.Group, middleware *Middleware
 
 	eventDetailedGuestGrouped := eventDetailGrouped.Group("/guests")
 	eventDetailedGuestGrouped.POST("", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleAddGuestToEvent))
+	eventDetailGrouped.POST("/arrived", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleUpdateGuestArrived))
 	eventDetailedGuestGrouped.DELETE("", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleDeleteGuests))
 	eventDetailedGuestGrouped.PATCH("/:guest_uuid", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleUpdateGuestVIPStatus))
 	eventDetailedGuestGrouped.POST("/:guest_uuid/invite", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleSentInvitation))
 }
 
-// @Summary		Create an event
-// @Description	Creates a new event for the authenticated user.
-// @Tags			events
-// @Accept			json
-// @Produce		json
-// @Security		BearerAuth
-// @Param			Authorization	header		string				true	"Bearer Token"
-// @Param			request			body		CreateEventRequest	true	"Event creation payload"
-// @Success		201				{object}	Response{data=entity.Event}
-// @Failure		400				{object}	Response	"Bad Request"
-// @Failure		500				{object}	Response	"Internal Server Error"
-// @Router			/events [post]
+//	@Summary		Create an event
+//	@Description	Creates a new event for the authenticated user.
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			Authorization	header		string				true	"Bearer Token"
+//	@Param			request			body		CreateEventRequest	true	"Event creation payload"
+//	@Success		201				{object}	Response{data=entity.Event}
+//	@Failure		400				{object}	Response	"Bad Request"
+//	@Failure		500				{object}	Response	"Internal Server Error"
+//	@Router			/events [post]
 func (h *EventHandler) handleCreateEvent(c echo.Context) error {
 	ctx := c.Request().Context()
 	const ops = "EventHandler.handleCreateEvent"
@@ -499,6 +501,48 @@ func (h *EventHandler) handleDeleteEvent(c echo.Context) error {
 	return c.JSON(http.StatusOK, Response{
 		StatusCode: http.StatusOK,
 		Message:    fmt.Sprintf("Success delete event %s: %v", eventUUID, success),
+		Data:       nil,
+		Error:      nil,
+	})
+}
+
+// handleUpdateGuestArrived updates the arrival status of a guest.
+//
+//	@Summary		Update guest arrival status
+//	@Description	Updates the arrival status of a guest using their short ID.
+//	@Tags			Guests
+//	@Accept			json
+//	@Produce		json
+//	@Param			short_id	query		string		true	"Guest Short ID"
+//	@Param			is_arrived	query		bool		true	"Arrival status (true/false)"
+//	@Success		200			{object}	Response	"Guest arrival status updated successfully"
+//	@Failure		400			{object}	Response	"Bad request (invalid guest ID or parameters)"
+//	@Failure		500			{object}	Response	"Internal server error"
+//	@Router			/events/{uuid}/guests/arrived [post]
+func (h *EventHandler) handleUpdateGuestArrived(c echo.Context) error {
+	guestUUID := c.QueryParam("short_id")
+	isArrived, _ := strconv.ParseBool(c.QueryParam("is_arrived"))
+	ctx := c.Request().Context()
+
+	if err := h.eventService.SetGuestIsArrived(ctx, guestUUID, isArrived); err != nil {
+		switch parsedErr := err.(type) {
+		case entity.GosmError:
+			if parsedErr.Type == entity.GosmErrorTypeBadRequest {
+				return c.JSON(http.StatusBadRequest, Response{
+					StatusCode: http.StatusBadRequest,
+					Message:    parsedErr.Message,
+					Data:       nil,
+					Error:      parsedErr.Source,
+				})
+			}
+		}
+
+		return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
+	}
+
+	return c.JSON(http.StatusOK, Response{
+		StatusCode: http.StatusOK,
+		Message:    fmt.Sprintf("Guest %s updated to arrived: %v", guestUUID, isArrived),
 		Data:       nil,
 		Error:      nil,
 	})

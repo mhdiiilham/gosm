@@ -643,6 +643,40 @@ paths:
       summary: Send guest invitation
       tags:
       - invitations
+  /events/{uuid}/guests/arrived:
+    post:
+      consumes:
+      - application/json
+      description: Updates the arrival status of a guest using their short ID.
+      parameters:
+      - description: Guest Short ID
+        in: query
+        name: short_id
+        required: true
+        type: string
+      - description: Arrival status (true/false)
+        in: query
+        name: is_arrived
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Guest arrival status updated successfully
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "400":
+          description: Bad request (invalid guest ID or parameters)
+          schema:
+            $ref: '#/definitions/delivery.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      summary: Update guest arrival status
+      tags:
+      - Guests
   /events/guests:
     delete:
       consumes:
