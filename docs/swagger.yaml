@@ -18,6 +18,17 @@ definitions:
           $ref: '#/definitions/delivery.GuestDetail'
         type: array
     type: object
+  delivery.Country:
+    properties:
+      country_code:
+        type: string
+      flag:
+        type: string
+      name:
+        type: string
+      phone_international_prefix:
+        type: integer
+    type: object
   delivery.CreateEventRequest:
     properties:
       digital_invitation_url:
@@ -36,6 +47,13 @@ definitions:
         type: string
       start_date:
         type: string
+    type: object
+  delivery.GetCountriesResponse:
+    properties:
+      countries:
+        items:
+          $ref: '#/definitions/delivery.Country'
+        type: array
     type: object
   delivery.GuestDetail:
     properties:
@@ -266,6 +284,29 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /api/v1/public/countries:
+    get:
+      description: Fetches a list of countries with their names, flags, and phone
+        international prefixes.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully get countries
+          schema:
+            allOf:
+            - $ref: '#/definitions/delivery.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/delivery.GetCountriesResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/delivery.Response'
+      summary: Get list of countries
+      tags:
+      - public
   /api/v1/public/guests:
     get:
       consumes:
@@ -303,7 +344,7 @@ paths:
             $ref: '#/definitions/delivery.Response'
       summary: Get guest by short ID
       tags:
-      - guests
+      - public
     post:
       consumes:
       - application/json
@@ -332,7 +373,7 @@ paths:
             $ref: '#/definitions/delivery.Response'
       summary: Update guest attending status
       tags:
-      - guests
+      - public
   /events:
     get:
       consumes:

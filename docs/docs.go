@@ -174,6 +174,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/public/countries": {
+            "get": {
+                "description": "Fetches a list of countries with their names, flags, and phone international prefixes.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public"
+                ],
+                "summary": "Get list of countries",
+                "responses": {
+                    "200": {
+                        "description": "Successfully get countries",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/delivery.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/delivery.GetCountriesResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/delivery.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/public/guests": {
             "get": {
                 "description": "Fetches guest information without requiring authentication.",
@@ -184,7 +222,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "guests"
+                    "public"
                 ],
                 "summary": "Get guest by short ID",
                 "parameters": [
@@ -244,7 +282,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "guests"
+                    "public"
                 ],
                 "summary": "Update guest attending status",
                 "parameters": [
@@ -975,6 +1013,23 @@ const docTemplate = `{
                 }
             }
         },
+        "delivery.Country": {
+            "type": "object",
+            "properties": {
+                "country_code": {
+                    "type": "string"
+                },
+                "flag": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_international_prefix": {
+                    "type": "integer"
+                }
+            }
+        },
         "delivery.CreateEventRequest": {
             "type": "object",
             "properties": {
@@ -1001,6 +1056,17 @@ const docTemplate = `{
                 },
                 "start_date": {
                     "type": "string"
+                }
+            }
+        },
+        "delivery.GetCountriesResponse": {
+            "type": "object",
+            "properties": {
+                "countries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/delivery.Country"
+                    }
                 }
             }
         },

@@ -13,7 +13,7 @@ import (
 //
 //	@Summary		Get guest by short ID
 //	@Description	Fetches guest information without requiring authentication.
-//	@Tags			guests
+//	@Tags			public
 //	@Accept			json
 //	@Produce		json
 //	@Param			short_id	query		string						true	"Guest Short ID"
@@ -45,7 +45,7 @@ func GetGuestByItShortID(srv EventService) echo.HandlerFunc {
 //
 //	@Summary		Update guest attending status
 //	@Description	Allows guests to update their attending status using a short ID.
-//	@Tags			guests
+//	@Tags			public
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		UpdateGuestAttendingAndMessage	true	"Guest attending status update request"
@@ -76,13 +76,15 @@ func UpdateGuestAttendingFromInvitation(srv EventService) echo.HandlerFunc {
 // HandleGetCountries handles the request to retrieve a list of countries.
 // TODO: Need to move this to gRPC server.
 //
-// @Summary Get list of countries
-// @Description Fetches a list of countries with their names, flags, and phone international prefixes.
-// @Tags Countries
-// @Produce json
-// @Success 200 {object} GetCountriesResponse
-// @Failure 500 {object} map[string]string
-// @Router /api/v1/public/countries [get]
+//	@Summary		Get list of countries
+//	@Description	Fetches a list of countries with their names, flags, and phone international prefixes.
+//	@Tags			public
+//	@Produce		json
+//
+//	@Success		200	{object}	Response{data=GetCountriesResponse}	"Successfully get countries"
+//	@Failure		500	{object}	Response							"Internal Server Error"
+//
+//	@Router			/api/v1/public/countries [get]
 func HandleGetCountries(token string) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req, _ := http.NewRequest(http.MethodGet, "https://aaapis.com/api/v1/info/countries/", nil)
