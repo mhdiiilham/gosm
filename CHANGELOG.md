@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.17.0](https://github.com/mhdiiilham/gosm/compare/v1.16.0...v1.17.0) (2025-02-23)
+
+
+### Features
+
+* created endpoint as a proxy to aaapis api ([4ef3d35](https://github.com/mhdiiilham/gosm/commit/4ef3d350f0e1c8f9f32624f2ff6192ea78cb7a56))
+
 # [1.16.0](https://github.com/mhdiiilham/gosm/compare/v1.15.1...v1.16.0) (2025-02-21)
 
 
