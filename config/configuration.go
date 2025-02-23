@@ -28,6 +28,12 @@ type Database struct {
 // Service represent variables required to connect with third-party library.
 type Service struct {
 	KirimWa KirimWaConfiguration `mapstructure:"kirimWa"`
+	Aaapis  Aaapis               `mapstructure:"aaapis"`
+}
+
+// Aaapis represent variables required to connect with third-party library.
+type Aaapis struct {
+	Token string `mapstructure:"token"`
 }
 
 // KirimWaConfiguration represent variables required to connect with api.kirimwa.id.

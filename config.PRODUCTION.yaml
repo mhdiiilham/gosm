@@ -10,3 +10,5 @@ services:
   kirimWa:
     key:
     deviceId:
+  aaapis:
+    token:
