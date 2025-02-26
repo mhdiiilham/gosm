@@ -1007,23 +1007,6 @@
                 }
             }
         },
-        "delivery.Country": {
-            "type": "object",
-            "properties": {
-                "country_code": {
-                    "type": "string"
-                },
-                "flag": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone_international_prefix": {
-                    "type": "integer"
-                }
-            }
-        },
         "delivery.CreateEventRequest": {
             "type": "object",
             "properties": {
@@ -1059,7 +1042,7 @@
                 "countries": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/delivery.Country"
+                        "$ref": "#/definitions/entity.Country"
                     }
                 }
             }
@@ -1119,6 +1102,23 @@
                 },
                 "short_id": {
                     "type": "string"
+                }
+            }
+        },
+        "entity.Country": {
+            "type": "object",
+            "properties": {
+                "country_code": {
+                    "type": "string"
+                },
+                "flag": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_international_prefix": {
+                    "type": "integer"
                 }
             }
         },

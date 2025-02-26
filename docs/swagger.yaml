@@ -18,17 +18,6 @@ definitions:
           $ref: '#/definitions/delivery.GuestDetail'
         type: array
     type: object
-  delivery.Country:
-    properties:
-      country_code:
-        type: string
-      flag:
-        type: string
-      name:
-        type: string
-      phone_international_prefix:
-        type: integer
-    type: object
   delivery.CreateEventRequest:
     properties:
       digital_invitation_url:
@@ -52,7 +41,7 @@ definitions:
     properties:
       countries:
         items:
-          $ref: '#/definitions/delivery.Country'
+          $ref: '#/definitions/entity.Country'
         type: array
     type: object
   delivery.GuestDetail:
@@ -92,6 +81,17 @@ definitions:
         type: string
       short_id:
         type: string
+    type: object
+  entity.Country:
+    properties:
+      country_code:
+        type: string
+      flag:
+        type: string
+      name:
+        type: string
+      phone_international_prefix:
+        type: integer
     type: object
   entity.Event:
     properties:

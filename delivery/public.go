@@ -2,12 +2,17 @@ package delivery
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/mhdiiilham/gosm/entity"
 )
+
+// CountryService defines the interface for country-related data operations.
+type CountryService interface {
+	GetCountries(ctx context.Context) (countries []entity.Country, err error)
+}
 
 // GetGuestByItShortID retrieves guest information using a short ID.
 //
@@ -85,16 +90,10 @@ func UpdateGuestAttendingFromInvitation(srv EventService) echo.HandlerFunc {
 //	@Failure		500	{object}	Response							"Internal Server Error"
 //
 //	@Router			/api/v1/public/countries [get]
-func HandleGetCountries(token string) echo.HandlerFunc {
+func HandleGetCountries(srv CountryService) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		req, _ := http.NewRequest(http.MethodGet, "https://aaapis.com/api/v1/info/countries/", nil)
-		req.Header.Add("Authorization", fmt.Sprintf("Token %s", token))
-
-		httpClient := http.Client{}
-		resp, _ := httpClient.Do(req)
-
-		var response GetCountriesResponse
-		err := json.NewDecoder(resp.Body).Decode(&response)
+		ctx := c.Request().Context()
+		countries, err := srv.GetCountries(ctx)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
 		}
@@ -104,8 +103,10 @@ func HandleGetCountries(token string) echo.HandlerFunc {
 			Response{
 				StatusCode: http.StatusOK,
 				Message:    "success get countries",
-				Data:       response,
-				Error:      nil,
+				Data: GetCountriesResponse{
+					Countries: countries,
+				},
+				Error: nil,
 			},
 		)
 

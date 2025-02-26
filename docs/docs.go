@@ -1013,23 +1013,6 @@ const docTemplate = `{
                 }
             }
         },
-        "delivery.Country": {
-            "type": "object",
-            "properties": {
-                "country_code": {
-                    "type": "string"
-                },
-                "flag": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone_international_prefix": {
-                    "type": "integer"
-                }
-            }
-        },
         "delivery.CreateEventRequest": {
             "type": "object",
             "properties": {
@@ -1065,7 +1048,7 @@ const docTemplate = `{
                 "countries": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/delivery.Country"
+                        "$ref": "#/definitions/entity.Country"
                     }
                 }
             }
@@ -1125,6 +1108,23 @@ const docTemplate = `{
                 },
                 "short_id": {
                     "type": "string"
+                }
+            }
+        },
+        "entity.Country": {
+            "type": "object",
+            "properties": {
+                "country_code": {
+                    "type": "string"
+                },
+                "flag": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_international_prefix": {
+                    "type": "integer"
                 }
             }
         },

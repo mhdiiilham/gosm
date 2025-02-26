@@ -79,15 +79,17 @@ func main() {
 	// Repositories here:
 	userRepository := repository.NewUserRepository(dbConn)
 	eventRepository := repository.NewEventRepository(dbConn)
+	countryRepository := repository.NewCountry(dbConn)
 
 	// Usecase here:
 	authService := service.NewAuthorizationService(userRepository, passwordHasher, jwtToken)
 	eventService := service.NewEventService(eventRepository, kirimWaClient, eventRepository.RunInTransactions)
+	countryService := service.NewCountry(countryRepository)
 
 	// register routes here:
 	e.GET("/api/v1/public/guests", delivery.GetGuestByItShortID(eventService))
 	e.POST("/api/v1/public/guests", delivery.UpdateGuestAttendingFromInvitation(eventService))
-	e.GET("/api/v1/public/countries", delivery.HandleGetCountries(cfg.Service.Aaapis.Token))
+	e.GET("/api/v1/public/countries", delivery.HandleGetCountries(countryService))
 
 	middleware := delivery.NewMiddleware(jwtToken, userRepository)
 
