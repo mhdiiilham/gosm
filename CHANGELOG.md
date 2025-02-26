@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.18.0](https://github.com/mhdiiilham/gosm/compare/v1.17.0...v1.18.0) (2025-02-26)
+
+
+### Features
+
+* **country:** fetch list of country from database ([5dce6b7](https://github.com/mhdiiilham/gosm/commit/5dce6b75244202b7745ec1d5c2e7c3d972d87451))
+
 # [1.17.0](https://github.com/mhdiiilham/gosm/compare/v1.16.0...v1.17.0) (2025-02-23)
 
 
