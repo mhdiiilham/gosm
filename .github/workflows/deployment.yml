@@ -70,8 +70,8 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          docker build -t gcr.io/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }} --build-arg VERSION=${{ github.ref_name }} --build-arg APP_ENV=${{ github.event.inputs.environment }} .
-          docker push gcr.io/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
+          docker build -t pkg.dev/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }} --build-arg VERSION=${{ github.ref_name }} --build-arg APP_ENV=${{ github.event.inputs.environment }} .
+          docker push pkg.dev/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
 
   deployment:
     name: Deploy Image To Cloud Run
@@ -91,7 +91,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: gosm
-          image: gcr.io/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
+          image: pkg.dev/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
           region: us-west1
           env_vars: |-
             APP_ENV=${{ github.event.inputs.environment }}
