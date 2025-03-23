@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.19.0](https://github.com/mhdiiilham/gosm/compare/v1.18.0...v1.19.0) (2025-03-23)
+
+
+### Features
+
+* **infra:** Update db and migrating to artifact registry ([fd95dfd](https://github.com/mhdiiilham/gosm/commit/fd95dfd2b07a3596f1363457d5ef22c452bcbc29))
+
 # [1.18.0](https://github.com/mhdiiilham/gosm/compare/v1.17.0...v1.18.0) (2025-02-26)
 
 
