@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.21.1](https://github.com/mhdiiilham/gosm/compare/v1.21.0...v1.21.1) (2025-07-14)
+
+
+### Bug Fixes
+
+* **ci:** fix pkg.dev ([8957229](https://github.com/mhdiiilham/gosm/commit/8957229701a518409a76f40a2f88a62df09640c7))
+
 # [1.21.0](https://github.com/mhdiiilham/gosm/compare/v1.20.0...v1.21.0) (2025-07-14)
 
 
