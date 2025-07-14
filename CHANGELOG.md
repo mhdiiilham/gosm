@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.19.1](https://github.com/mhdiiilham/gosm/compare/v1.19.0...v1.19.1) (2025-07-14)
+
+
+### Bug Fixes
+
+* I forget what, but 2 weeks before my wedding ([ce7648a](https://github.com/mhdiiilham/gosm/commit/ce7648aa15d3f277cb22dbc0a2ce0ae95fbf6835))
+
 # [1.19.0](https://github.com/mhdiiilham/gosm/compare/v1.18.0...v1.19.0) (2025-03-23)
 
 
