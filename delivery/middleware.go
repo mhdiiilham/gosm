@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"slices"
 	"strings"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mhdiiilham/gosm/entity"
@@ -14,7 +13,6 @@ import (
 
 // JwtGenerator defines an interface for handling JWT operations, including token creation and parsing.
 type JwtGenerator interface {
-	CreateAccessToken(userID, email string, userRole entity.UserRole, duration time.Duration) (response *entity.AuthResponse, err error)
 	ParseToken(accessToken string) (*pkg.TokenClaims, error)
 }
 
@@ -36,7 +34,7 @@ var (
 	// AllowedAuthenticatedOnly only allow requet with valid access token.
 	AllowedAuthenticatedOnly = []entity.UserRole{
 		entity.UserRoleSuperAdmin,
-		entity.UserRoleOrganizer,
+		entity.UserRoleEOOrganizer,
 		entity.UserRoleHost,
 		entity.UserRoleGuest,
 	}
@@ -87,7 +85,8 @@ func (m *Middleware) AuthMiddleware(allowedRoles []entity.UserRole, next echo.Ha
 		}
 
 		c.Set("user_id", claims.ID)
-		c.Set("user_email", claims.Email)
+		c.Set("user_email", email)
+		c.Set("company_id", claims.CompanyID)
 
 		return next(c)
 	}

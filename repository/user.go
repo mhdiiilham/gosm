@@ -23,7 +23,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 // CreateUser inserts a new user record into the database.
 // This function takes a `newUser` entity containing user details and inserts it into the database.
 // It returns the created user with a generated ID or an error if the operation fails.
-func (r *UserRepository) CreateUser(ctx context.Context, newUser entity.User) (createdUser *entity.User, err error) {
+func (r *UserRepository) CreateUser(ctx context.Context, newUser entity.User, companyID *int) (createdUser *entity.User, err error) {
 	const ops = "UserRepository.CreateUser"
 
 	row := r.db.QueryRowContext(
@@ -34,7 +34,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, newUser entity.User) (c
 		newUser.Email,
 		newUser.Password,
 		newUser.PhoneNumber,
-		newUser.CountryCode,
+		companyID,
 	)
 
 	if err := row.Scan(&newUser.ID); err != nil {
@@ -59,7 +59,7 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 		&existingUser.Email,
 		&existingUser.Password,
 		&existingUser.PhoneNumber,
-		&existingUser.CountryCode,
+		&existingUser.CompanyID,
 	); err != nil {
 		return nil, err
 	}
@@ -68,8 +68,10 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 }
 
 // GetUserByID retrieves a user from the database based on their id.
-func (r *UserRepository) GetUserByID(ctx context.Context, userID string) (targetUser *entity.User, err error) {
+func (r *UserRepository) GetUserByID(ctx context.Context, userID int) (targetUser *entity.User, err error) {
 	targetUser = &entity.User{}
+
+	logger.Infof(ctx, "UserRepository.GetUserByID", "query user with id=%d", userID)
 
 	row := r.db.QueryRowContext(ctx, SQLStatementSelectUserByID, userID)
 	if err := row.Scan(
@@ -80,7 +82,7 @@ func (r *UserRepository) GetUserByID(ctx context.Context, userID string) (target
 		&targetUser.Email,
 		&targetUser.Password,
 		&targetUser.PhoneNumber,
-		&targetUser.CountryCode,
+		&targetUser.CompanyID,
 	); err != nil {
 		return nil, err
 	}

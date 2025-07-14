@@ -6,15 +6,15 @@ var (
 	// The query returns the newly created event's ID.
 	SQLStatementInsertEvent = `
 		INSERT INTO events (
-			uuid,
-			name,
+			title,
+			event_type,
+			description,
 			location,
-			start_date,
-			end_date,
-			digital_invitation_url,
-			host,
-			message_template,
-			event_type
+			start_time,
+			end_time,
+			created_by,
+			company_id,
+			guest_count
 		)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING "id";
@@ -39,21 +39,24 @@ var (
 	// The results are ordered by `created_at` in descending order.
 	SQLStatementSelectEvents = `
 		SELECT
-			id,
-			uuid,
-			name,
-			location,
-			start_date,
-			end_date,
-			digital_invitation_url,
-			created_at,
-			updated_at,
-			host
+			events.id,
+			events.title,
+			events.description,
+			events.location,
+			events.start_time,
+			events.end_time,
+			events.created_by,
+			users.first_name,
+			events.company_id,
+			companies.name,
+			events.created_at,
+			events.updated_at,
+			events.event_type,
+			events.guest_count
 		FROM events
-		JOIN event_user_organizers ON events.id = event_user_organizers.event_id
-		WHERE
-			deleted_at IS NULL
-			AND event_user_organizers.user_id = $1
+		JOIN users ON events.created_by = users.id
+		JOIN companies ON events.company_id = companies.id
+		WHERE events.company_id = $1
 		ORDER BY created_at DESC
 		LIMIT $2 OFFSET $3;
 	`
@@ -63,33 +66,32 @@ var (
 	SQLStatementCountEvents = `
 		SELECT COUNT(events.id) AS "total_events"
 		FROM events
-		JOIN event_user_organizers ON events.id = event_user_organizers.event_id
-		WHERE
-			deleted_at IS NULL
-			AND event_user_organizers.user_id = $1;
+		WHERE events.company_id = $1
 	`
 
-	// SQLStatementSelectEventsByUUID retrieves a specific event by its UUID.
+	// SQLStatementSelectEventsByID retrieves a specific event by its UUID.
 	// It ensures the event is not soft-deleted (`deleted_at IS NULL`) and belongs to the specified user.
-	SQLStatementSelectEventsByUUID = `
+	SQLStatementSelectEventsByID = `
 		SELECT
-			id,
-			uuid,
-			name,
-			location,
-			start_date,
-			end_date,
-			digital_invitation_url,
-			created_at,
-			updated_at,
-			host,
-			message_template,
-			event_type
+			events.id,
+			events.event_type,
+			events.title,
+			events.description,
+			events.location,
+			events.start_time,
+			events.end_time,
+			events.created_by,
+			users.first_name,
+			events.company_id,
+			companies.name,
+			events.created_at,
+			events.updated_at,
+			events.guest_count
 		FROM events
-		JOIN event_user_organizers ON events.id = event_user_organizers.event_id
-		WHERE deleted_at IS NULL
-			AND event_user_organizers.user_id = $1
-			AND events.uuid = $2;
+		JOIN users ON events.created_by = users.id
+		JOIN companies ON events.company_id = companies.id
+		WHERE events.id = $1
+			AND events.created_by = $2;
 	`
 
 	// SQLStatementInsertEventUserOrganizer links a user to an event as an organizer.
@@ -105,71 +107,41 @@ var (
 	// The guest will be associated with a specific event by `event_uuid`.
 	// The query ensures that duplicate guests (same name and phone number) are not added.
 	SQLStatementAddGuestToEvent = `
-		INSERT INTO event_user_guests (event_uuid, guest_uuid, name, phone_number, is_vip, short_id)
-		SELECT 
-			$1,
-    		$2,
-    		$3,
-    		$4,
-			$5,
-			$6
-		WHERE NOT EXISTS (
-    		SELECT 1 FROM event_user_guests
-    		WHERE name = $7
-      		AND phone_number = $8
-		);
+		INSERT INTO guests (event_id, name, email, phone, is_vip, barcode_id)
+		VALUES ($1, $2, $3, $4, $5, $6);
 	`
 
 	// SQLStatementGetGuestList retrieves all guests associated with a given event.
 	// The results are ordered by VIP status in descending order.
 	SQLStatementGetGuestList = `
 		SELECT
-			guest_uuid,
+			id,
+			event_id,
 			name,
-			phone_number,
-			message,
-			will_attend_event,
-			qr_code_identifier,
-			is_vip::BOOLEAN,
-			is_invitation_sent,
-			short_id
-		FROM event_user_guests
-		WHERE event_uuid = $1
-		ORDER BY event_user_guests.is_vip DESC NULLS LAST;
+			email,
+			phone,
+			is_vip,
+			checked_in,
+			barcode_id
+		FROM guests
+		WHERE guests.event_id = $1
+		ORDER BY guests.is_vip DESC;
 	`
 
 	// SQLStatementGetGuest retrieves guests associated with a given id.
 	SQLStatementGetGuest = `
 		SELECT
-			guest_uuid,
+			id,
+			event_id,
 			name,
-			phone_number,
-			message,
-			will_attend_event::BOOLEAN,
-			qr_code_identifier,
-			is_vip::BOOLEAN,
-			is_invitation_sent,
-			short_id
-		FROM event_user_guests
-		WHERE guest_uuid = $1
-		ORDER BY event_user_guests.is_vip DESC NULLS LAST;
-	`
-
-	// SQLStatementGetGuestByShortID retrieves guest with give short_id.
-	SQLStatementGetGuestByShortID = `
-		SELECT
-			guest_uuid,
-			name,
-			phone_number,
-			message,
-			will_attend_event,
-			qr_code_identifier,
-			is_vip::BOOLEAN,
-			is_invitation_sent,
-			short_id
-		FROM event_user_guests
-		WHERE short_id = $1
-		ORDER BY event_user_guests.is_vip DESC NULLS LAST;
+			email,
+			phone,
+			is_vip,
+			checked_in,
+			barcode_id
+		FROM guests
+		WHERE guests.barcode_id = $1
+		LIMIT 1;
 	`
 
 	// SQLStatementUpdateGuestAttendAndMessage updates the guest's attendance status and message.

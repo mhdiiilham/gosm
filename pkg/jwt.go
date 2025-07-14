@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -13,9 +14,10 @@ import (
 // and custom claims like the user ID and email.
 type TokenClaims struct {
 	jwt.StandardClaims
-	ID    string          `json:"id"`
-	Email string          `json:"email"`
-	Role  entity.UserRole `json:"role"`
+	ID        int             `json:"user_id"`
+	CompanyID int             `json:"company_id"`
+	Email     string          `json:"email"`
+	Role      entity.UserRole `json:"role"`
 }
 
 // JwtGenerator is responsible for generating and validating JWT tokens.
@@ -43,18 +45,18 @@ func NewJwtGenerator(
 
 // CreateAccessToken generates a JWT token containing the user's ID and email.
 // The token is signed using the configured signing method and secret key.
-func (g JwtGenerator) CreateAccessToken(userID, email string, userRole entity.UserRole, duration time.Duration) (response *entity.AuthResponse, err error) {
-	tokenExpiredAt := time.Now().Add(duration)
+func (g JwtGenerator) CreateAccessToken(userID int, CompanyID int, email string, userRole entity.UserRole) (response *entity.AuthResponse, err error) {
 	claims := TokenClaims{
 		StandardClaims: jwt.StandardClaims{
+			Subject:   strconv.Itoa(userID),
 			Issuer:    g.applicationName,
-			ExpiresAt: tokenExpiredAt.Unix(),
 			NotBefore: time.Now().Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-		ID:    userID,
-		Email: email,
-		Role:  userRole,
+		ID:        userID,
+		CompanyID: CompanyID,
+		Email:     email,
+		Role:      userRole,
 	}
 
 	token := jwt.NewWithClaims(g.signingMethod, claims)
@@ -66,7 +68,6 @@ func (g JwtGenerator) CreateAccessToken(userID, email string, userRole entity.Us
 
 	return &entity.AuthResponse{
 		AccessToken: signedToken,
-		ExpiresAt:   tokenExpiredAt.Format(time.RFC3339Nano),
 		Email:       email,
 		Role:        userRole,
 	}, nil
@@ -94,13 +95,16 @@ func (g JwtGenerator) ParseToken(accessToken string) (*TokenClaims, error) {
 		return nil, entity.ErrInvalidAccessToken
 	}
 
+	// fmt.Printf("claims: %+v user_id:%d\n", claims, claims["user_id"].(int))
 	email, _ := claims["email"].(string)
-	id, _ := claims["id"].(string)
+	ID, _ := claims["user_id"].(float64)
+	companyID, _ := claims["company_id"].(float64)
 	userRole, _ := claims["role"].(string)
 
 	return &TokenClaims{
-		ID:    id,
-		Email: email,
-		Role:  entity.UserRole(userRole),
+		ID:        int(ID),
+		CompanyID: int(companyID),
+		Email:     email,
+		Role:      entity.UserRole(userRole),
 	}, nil
 }

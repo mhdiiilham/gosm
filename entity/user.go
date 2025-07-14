@@ -12,11 +12,14 @@ var (
 	// UserRoleSuperAdmin represents an super admin role.
 	UserRoleSuperAdmin UserRole = "super_admin"
 
-	// UserRoleOrganizer represents an organizer role.
-	UserRoleOrganizer UserRole = "organizer"
+	// UserRoleEOOrganizer represents an eo organizer role.
+	UserRoleEOOrganizer UserRole = "eo_admin"
 
-	// UserRoleHost represents a host role.
-	UserRoleHost UserRole = "host"
+	// UserRoleCrew represents an crew role.
+	UserRoleCrew UserRole = "crew"
+
+	// UserRoleHost represents an independent host role.
+	UserRoleHost UserRole = "independent_host"
 
 	// UserRoleGuest represents a guest role.
 	UserRoleGuest UserRole = "guest"
@@ -24,17 +27,18 @@ var (
 
 // User represents a user entity with personal and contact information.
 type User struct {
-	ID          string     `json:"id" db:"id"`
-	FirstName   string     `json:"first_name" db:"first_name"`
-	LastName    *string    `json:"last_name" db:"last_name"`
-	Role        UserRole   `json:"role" db:"role"`
-	Email       string     `json:"email" db:"email"`
-	Password    string     `json:"-" db:"password"`
-	CountryCode *string    `json:"country_code" db:"country_ode"`
-	PhoneNumber *string    `json:"phone_number" db:"phone_umber"`
-	CreatedAt   time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at" db:"updated_at"`
-	DeletedAt   *time.Time `json:"-" db:"deleted_at"`
+	ID          int        `json:"id"`
+	FirstName   string     `json:"first_name"`
+	LastName    *string    `json:"last_name"`
+	Role        UserRole   `json:"role"`
+	Email       string     `json:"email"`
+	Password    string     `json:"-"`
+	PhoneNumber *string    `json:"phone_number"`
+	JobTitle    *string    `json:"job_title"`
+	CompanyID   *int       `json:"company_id"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   *time.Time `json:"-"`
 }
 
 // GetName returns the full name of the user.
@@ -44,4 +48,13 @@ func (u User) GetName() string {
 		return u.FirstName
 	}
 	return fmt.Sprintf("%s %s", u.FirstName, *u.LastName)
+}
+
+// GetCompanyID ...
+func (u User) GetCompanyID() int {
+	if u.CompanyID == nil {
+		return 0
+	}
+
+	return *u.CompanyID
 }

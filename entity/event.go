@@ -82,18 +82,17 @@ func ParseEventType(event string) EventType {
 
 // Event represents an event entity with relevant metadata.
 type Event struct {
-	ID                   string     `json:"id"`
-	UUID                 string     `json:"uuid"`
-	Name                 string     `json:"name"`
-	EventType            EventType  `json:"event_type"`
-	Host                 *string    `json:"host"`
-	Location             string     `json:"location"`
-	StartDate            string     `json:"start_date"`
-	EndDate              string     `json:"end_date"`
-	DigitalInvitationURL string     `json:"digital_invitation_url"`
-	GuestList            []Guest    `json:"guest_list"`
-	MessageTemplate      *string    `json:"message_template"`
-	CreatedAt            time.Time  `json:"created_at"`
-	UpdatedAt            time.Time  `json:"updated_at"`
-	DeletedAt            *time.Time `json:"deleted_at"`
+	ID          int       `json:"id"`
+	Title       string    `json:"title"`
+	Type        EventType `json:"type"`
+	Description string    `json:"description"`
+	Location    string    `json:"location"`
+	StartDate   time.Time `json:"startDate"`
+	EndDate     time.Time `json:"endDate"`
+	CreatedBy   IDName    `json:"createdBy"`
+	Company     IDName    `json:"company"`
+	GuestCount  int       `json:"guestCount"`
+	Guests      []Guest   `json:"guests"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }

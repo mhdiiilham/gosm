@@ -15,3 +15,9 @@ type PaginationRequest struct {
 	PerPage int
 	Field   map[string]any
 }
+
+// IDName ...
+type IDName struct {
+	ID   int
+	Name string
+}

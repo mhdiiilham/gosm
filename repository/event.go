@@ -3,12 +3,12 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"strconv"
 
-	"github.com/AlekSi/pointer"
-	"github.com/google/uuid"
 	"github.com/lib/pq"
 	"github.com/mhdiiilham/gosm/entity"
 	"github.com/mhdiiilham/gosm/logger"
+	"github.com/mhdiiilham/gosm/pkg"
 )
 
 // EventRepository provides methods for interacting with the "events" database table.
@@ -41,52 +41,48 @@ func (r *EventRepository) RunInTransactions(ctx context.Context, fn entity.Trans
 
 // CreateEvent inserts a new event into the "events" table and returns the created event.
 // It assigns a generated event ID to the input entity.
-func (r *EventRepository) CreateEvent(ctx context.Context, userID string, event entity.Event) (createdEvent *entity.Event, err error) {
+func (r *EventRepository) CreateEvent(ctx context.Context, event entity.Event) (createdEvent *entity.Event, err error) {
 	row := r.db.QueryRowContext(
 		ctx,
 		SQLStatementInsertEvent,
-		event.UUID,
-		event.Name,
+		event.Title,
+		event.Type,
+		event.Description,
 		event.Location,
 		event.StartDate,
 		event.EndDate,
-		event.DigitalInvitationURL,
-		event.Host,
-		event.MessageTemplate,
-		event.EventType,
+		event.CreatedBy.ID,
+		event.Company.ID,
+		event.GuestCount,
 	)
 
 	if err := row.Scan(&event.ID); err != nil {
 		return nil, err
 	}
 
-	_, err = r.db.ExecContext(ctx, SQLStatementInsertEventUserOrganizer, userID, event.ID)
-	if err != nil {
-		logger.Errorf(ctx, "EventRepository.CreateEvent", "failed to insert user id as organizer")
-		// handle error later
-	}
-
 	return &event, nil
 }
 
 // GetEvent retrieves an event by its UUID for a specific user.
-func (r *EventRepository) GetEvent(ctx context.Context, tx *sql.Tx, userID, UUID string) (event *entity.Event, err error) {
-	row := tx.QueryRowContext(ctx, SQLStatementSelectEventsByUUID, userID, UUID)
+func (r *EventRepository) GetEvent(ctx context.Context, tx *sql.Tx, userID, eventID int) (event *entity.Event, err error) {
+	row := tx.QueryRowContext(ctx, SQLStatementSelectEventsByID, eventID, userID)
 
 	event = &entity.Event{}
 	if err := row.Scan(
 		&event.ID,
-		&event.UUID,
-		&event.Name,
+		&event.Type,
+		&event.Title,
+		&event.Description,
 		&event.Location,
 		&event.StartDate,
 		&event.EndDate,
-		&event.DigitalInvitationURL,
+		&event.CreatedBy.ID,
+		&event.CreatedBy.Name,
+		&event.Company.ID,
+		&event.Company.Name,
 		&event.CreatedAt,
 		&event.UpdatedAt,
-		&event.Host,
-		&event.MessageTemplate,
-		&event.EventType,
+		&event.GuestCount,
 	); err != nil {
 		return nil, err
 	}
@@ -94,17 +90,17 @@ func (r *EventRepository) GetEvent(ctx context.Context, tx *sql.Tx, userID, UUID
 	return event, nil
 }
 
-// GetEvents retrieves a paginated list of events for a specific user.
-func (r *EventRepository) GetEvents(ctx context.Context, userID string, limit, offset int) ([]entity.Event, int, error) {
+// GetEvents retrieves a paginated list of events for a specific company.
+func (r *EventRepository) GetEvents(ctx context.Context, companyID int, limit, offset int) ([]entity.Event, int, error) {
 	const ops = "EventRepository.GetEvents"
 
 	var totalEvents int
-	if err := r.db.QueryRowContext(ctx, SQLStatementCountEvents, userID).Scan(&totalEvents); err != nil {
+	if err := r.db.QueryRowContext(ctx, SQLStatementCountEvents, companyID).Scan(&totalEvents); err != nil {
 		logger.Errorf(ctx, ops, "failed to fetch events: %v", err)
 		return nil, 0, err
 	}
 
-	rows, err := r.db.QueryContext(ctx, SQLStatementSelectEvents, userID, limit, offset)
+	rows, err := r.db.QueryContext(ctx, SQLStatementSelectEvents, companyID, limit, offset)
 	if err != nil {
 		logger.Errorf(ctx, ops, "failed to fetch events: %v", err)
 		return nil, 0, err
@@ -113,20 +109,27 @@ func (r *EventRepository) GetEvents(ctx context.Context, userID string, limit, o
 	events := []entity.Event{}
 	for rows.Next() {
 		event := entity.Event{}
+		var eventType string
 		if err := rows.Scan(
 			&event.ID,
-			&event.UUID,
-			&event.Name,
+			&event.Title,
+			&event.Description,
 			&event.Location,
 			&event.StartDate,
 			&event.EndDate,
-			&event.DigitalInvitationURL,
+			&event.CreatedBy.ID,
+			&event.CreatedBy.Name,
+			&event.Company.ID,
+			&event.Company.Name,
 			&event.CreatedAt,
 			&event.UpdatedAt,
-			&event.Host,
+			&eventType,
+			&event.GuestCount,
 		); err != nil {
 			logger.Errorf(ctx, ops, "failed to scan an event: %v", err)
 		}
+
+		event.Type = entity.ParseEventType(eventType)
 
 		events = append(events, event)
 
@@ -136,26 +139,19 @@ func (r *EventRepository) GetEvents(ctx context.Context, userID string, limit, o
 }
 
 // AddGuests adds a list of guests to an event.
-func (r *EventRepository) AddGuests(ctx context.Context, eventUUID string, guestList []entity.Guest) (numberOfSuccess int, err error) {
+func (r *EventRepository) AddGuests(ctx context.Context, eventID int, guestList []entity.Guest) (numberOfSuccess int, err error) {
 	const ops = "EventRepository.AddGuests"
 
 	for _, guest := range guestList {
-		generatedUUID := uuid.NewString()
-		isVIP := "0"
-		if guest.IsVIP {
-			isVIP = "1"
-		}
-
+		id, _ := pkg.GeneratePumBookID(strconv.Itoa(eventID))
 		r, err := r.db.ExecContext(
 			ctx, SQLStatementAddGuestToEvent,
-			eventUUID,
-			generatedUUID,
+			eventID,
 			guest.Name,
-			guest.PhoneNumber,
-			isVIP,
-			guest.ShortID,
-			guest.Name,
-			guest.PhoneNumber,
+			guest.Email,
+			guest.Phone,
+			guest.IsVIP,
+			id,
 		)
 		if err != nil {
 			logger.Errorf(ctx, ops, "failed to add guest to an event: %v", err)
@@ -176,10 +172,10 @@ func (r *EventRepository) AddGuests(ctx context.Context, eventUUID string, guest
 //	Will have to query guests per batch.
 //	each probably like 100?
 //	Also have to limit the number of workers (like 2 or 3?)
-func (r *EventRepository) GetGuests(ctx context.Context, tx *sql.Tx, eventUUID string) (response []entity.Guest, err error) {
+func (r *EventRepository) GetGuests(ctx context.Context, eventID int) (response []entity.Guest, err error) {
 	response = []entity.Guest{}
 
-	rows, err := tx.QueryContext(ctx, SQLStatementGetGuestList, eventUUID)
+	rows, err := r.db.QueryContext(ctx, SQLStatementGetGuestList, eventID)
 	if err != nil {
 		logger.Errorf(ctx, "EventRepository.GetGuests", "failed to retrieve list of guest: %v", err)
 		return nil, err
@@ -188,15 +184,14 @@ func (r *EventRepository) GetGuests(ctx context.Context, tx *sql.Tx, eventUUID s
 	for rows.Next() {
 		guest := entity.Guest{}
 		rows.Scan(
-			&guest.UUID,
+			&guest.ID,
+			&guest.EventID,
 			&guest.Name,
-			&guest.PhoneNumber,
-			&guest.Message,
-			&guest.WillAttendEvent,
-			&guest.QRCodeIdentifier,
+			&guest.Email,
+			&guest.Phone,
 			&guest.IsVIP,
-			&guest.IsInvitationSent,
-			&guest.ShortID,
+			&guest.CheckedIn,
+			&guest.BarcodeID,
 		)
 
 		response = append(response, guest)
@@ -207,10 +202,10 @@ func (r *EventRepository) GetGuests(ctx context.Context, tx *sql.Tx, eventUUID s
 }
 
 // DeleteGuests delete list of selected guest.
-func (r *EventRepository) DeleteGuests(ctx context.Context, userID string, guestUUIDs []string) error {
+func (r *EventRepository) DeleteGuests(ctx context.Context, userID int, guestIDs []int) error {
 	toDeleteIDs := pq.StringArray{}
-	for _, g := range guestUUIDs {
-		toDeleteIDs = append(toDeleteIDs, g)
+	for _, g := range guestIDs {
+		toDeleteIDs = append(toDeleteIDs, strconv.Itoa(g))
 	}
 
 	if _, err := r.db.ExecContext(ctx, SQLStatemetDeleteGuest, toDeleteIDs); err != nil {
@@ -222,13 +217,13 @@ func (r *EventRepository) DeleteGuests(ctx context.Context, userID string, guest
 }
 
 // UpdateGuestVIPStatus update the guest's vip status.
-func (r *EventRepository) UpdateGuestVIPStatus(ctx context.Context, guestUUID string, vipStatus bool) error {
+func (r *EventRepository) UpdateGuestVIPStatus(ctx context.Context, guestID int, vipStatus bool) error {
 	isVIPStatus := "0"
 	if vipStatus {
 		isVIPStatus = "1"
 	}
 
-	if _, err := r.db.ExecContext(ctx, SQLStatemetSetGuestVIPStatus, isVIPStatus, guestUUID); err != nil {
+	if _, err := r.db.ExecContext(ctx, SQLStatemetSetGuestVIPStatus, isVIPStatus, guestID); err != nil {
 		logger.Errorf(ctx, "EventRepository.GetGuests", "failed to update guest vip status: %v", err)
 		return nil
 	}
@@ -237,21 +232,19 @@ func (r *EventRepository) UpdateGuestVIPStatus(ctx context.Context, guestUUID st
 }
 
 // GetGuest get a guest of an event.
-func (r *EventRepository) GetGuest(ctx context.Context, guestUUID string) (guest *entity.Guest, err error) {
+func (r *EventRepository) GetGuest(ctx context.Context, barcodeID string) (guest *entity.Guest, err error) {
 	targetGuest := entity.Guest{}
-	if err := r.db.QueryRowContext(ctx, SQLStatementGetGuest, guestUUID).Scan(
-		&targetGuest.UUID,
+	if err := r.db.QueryRowContext(ctx, SQLStatementGetGuest, barcodeID).Scan(
+		&targetGuest.ID,
+		&targetGuest.EventID,
 		&targetGuest.Name,
-		&targetGuest.PhoneNumber,
-		&targetGuest.Message,
-		&targetGuest.WillAttendEvent,
-		&targetGuest.QRCodeIdentifier,
+		&targetGuest.Email,
+		&targetGuest.Phone,
 		&targetGuest.IsVIP,
-		&targetGuest.IsInvitationSent,
-		&targetGuest.ShortID,
+		&targetGuest.CheckedIn,
+		&targetGuest.BarcodeID,
 	); err != nil {
 		logger.Errorf(ctx, "EventRepository.GetGuest", "failed to retrieve guest: %v", err)
-		// handle error later
 		return nil, err
 	}
 
@@ -260,80 +253,58 @@ func (r *EventRepository) GetGuest(ctx context.Context, guestUUID string) (guest
 
 // UpdateEvent update an existing event.
 func (r *EventRepository) UpdateEvent(ctx context.Context, event entity.Event) (err error) {
-	_, err = r.db.ExecContext(
-		ctx,
-		SQLStatemetnUpdateEvent,
-		event.Name,
-		event.Location,
-		event.StartDate,
-		event.EndDate,
-		event.DigitalInvitationURL,
-		event.Host,
-		event.MessageTemplate,
-		event.EventType,
-		event.UUID,
-	)
-	if err != nil {
-		logger.Errorf(ctx, "EventRepository.UpdateEvent", "failed to update event: %v", err)
-		return nil
-	}
+	// _, err = r.db.ExecContext(
+	// 	ctx,
+	// 	SQLStatemetnUpdateEvent,
+	// 	event.Name,
+	// 	event.Location,
+	// 	event.StartDate,
+	// 	event.EndDate,
+	// 	event.DigitalInvitationURL,
+	// 	event.Host,
+	// 	event.MessageTemplate,
+	// 	event.EventType,
+	// 	event.UUID,
+	// )
+	// if err != nil {
+	// 	logger.Errorf(ctx, "EventRepository.UpdateEvent", "failed to update event: %v", err)
+	// 	return nil
+	// }
 
 	return nil
 }
 
 // UpdateGuestInvitation update given guest_uuid invitation related values.
 func (r *EventRepository) UpdateGuestInvitation(ctx context.Context, guest entity.Guest) (err error) {
-	willAttendEvent := "0"
+	// willAttendEvent := "0"
 
-	if guest.WillAttendEvent != nil {
-		if pointer.Get(guest.WillAttendEvent) {
-			willAttendEvent = "1"
-		}
-	}
+	// if guest.WillAttendEvent != nil {
+	// 	if pointer.Get(guest.WillAttendEvent) {
+	// 		willAttendEvent = "1"
+	// 	}
+	// }
 
-	if _, err := r.db.ExecContext(ctx, SQLStatementUpdateGuestInvitation,
-		guest.IsInvitationSent,
-		willAttendEvent,
-		guest.GetQrCodeIdentifier(),
-		guest.UUID,
-	); err != nil {
-		logger.Errorf(ctx, "EventRepository.UpdateGuestInvitation", "failed to update guest's invitation related fields: %v", err)
-		return err
-	}
+	// if _, err := r.db.ExecContext(ctx, SQLStatementUpdateGuestInvitation,
+	// 	guest.IsInvitationSent,
+	// 	willAttendEvent,
+	// 	guest.GetQrCodeIdentifier(),
+	// 	guest.UUID,
+	// ); err != nil {
+	// 	logger.Errorf(ctx, "EventRepository.UpdateGuestInvitation", "failed to update guest's invitation related fields: %v", err)
+	// 	return err
+	// }
 
 	return nil
 }
 
-// GetGuestByShortID get a guest of an event using it short_id.
-func (r *EventRepository) GetGuestByShortID(ctx context.Context, guestShortID string) (guest *entity.Guest, err error) {
-	targetGuest := entity.Guest{}
-	if err := r.db.QueryRowContext(ctx, SQLStatementGetGuestByShortID, guestShortID).Scan(
-		&targetGuest.UUID,
-		&targetGuest.Name,
-		&targetGuest.PhoneNumber,
-		&targetGuest.Message,
-		&targetGuest.WillAttendEvent,
-		&targetGuest.QRCodeIdentifier,
-		&targetGuest.IsVIP,
-		&targetGuest.IsInvitationSent,
-		&targetGuest.ShortID,
-	); err != nil {
-		logger.Errorf(ctx, "EventRepository.GetGuestByShortID", "failed to retrieve guest: %v", err)
-		// handle error later
-		return nil, err
-	}
-
-	return &targetGuest, nil
-}
-
 // UpdateGuestAttendingStatus update guest's attending status
-func (r *EventRepository) UpdateGuestAttendingStatus(ctx context.Context, guestShortID string, isAttending bool, message string) (err error) {
+func (r *EventRepository) UpdateGuestAttendingStatus(ctx context.Context, guestID int, isAttending bool, message string) (err error) {
 	willAttend := "0"
 	if isAttending {
 		willAttend = "1"
 	}
 
-	if _, err := r.db.ExecContext(ctx, SQLStatementUpdateGuestAttendAndMessage, willAttend, message, guestShortID); err != nil {
+	if _, err := r.db.ExecContext(ctx, SQLStatementUpdateGuestAttendAndMessage, willAttend, message, guestID); err != nil {
 		logger.Errorf(ctx, "EventRepository.UpdateGuestAttendingStatus", "failed to update guest: %v", err)
 	}
 
@@ -341,15 +312,15 @@ func (r *EventRepository) UpdateGuestAttendingStatus(ctx context.Context, guestS
 }
 
 // DeleteEvent soft delete an event based on it given uuid.
-func (r *EventRepository) DeleteEvent(ctx context.Context, eventUUID string) (bool, error) {
-	result, err := r.db.ExecContext(ctx, SQLStatementDeleteEvent, eventUUID)
+func (r *EventRepository) DeleteEvent(ctx context.Context, eventID int) (bool, error) {
+	result, err := r.db.ExecContext(ctx, SQLStatementDeleteEvent, eventID)
 	if err != nil {
 		logger.Errorf(ctx, "EventRepository.DeleteEvent", "failed to delete event: %v", err)
 		return false, err
 	}
 
 	// ignore result and error.
-	_, err = r.db.ExecContext(ctx, SQLStatementDeleteEventGuests, eventUUID)
+	_, err = r.db.ExecContext(ctx, SQLStatementDeleteEventGuests, eventID)
 	if err != nil {
 		logger.Errorf(ctx, "EventRepository.DeleteEvent", "failed to remove guests from event: %v", err)
 	}
@@ -359,8 +330,8 @@ func (r *EventRepository) DeleteEvent(ctx context.Context, eventUUID string) (bo
 }
 
 // SetGuestIsArrived update an guest `is_arrived`
-func (r *EventRepository) SetGuestIsArrived(ctx context.Context, guestShortID string, isArrived bool) (err error) {
-	_, err = r.db.ExecContext(ctx, SQLStatementUpdateGuestArrived, isArrived, guestShortID)
+func (r *EventRepository) SetGuestIsArrived(ctx context.Context, guestID int, isArrived bool) (err error) {
+	_, err = r.db.ExecContext(ctx, SQLStatementUpdateGuestArrived, isArrived, guestID)
 	if err != nil {
 		logger.Errorf(ctx, "EventRepository.DeleteEvent", "failed to update guest is_arrived: %v", err)
 	}

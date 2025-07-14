@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/AlekSi/pointer"
 	"github.com/labstack/echo/v4"
@@ -14,10 +13,11 @@ import (
 
 // AuthService defines authentication-related operations.
 type AuthService interface {
-	RegisterNewUser(ctx context.Context, user entity.User) (createdUser *entity.User, err error)
-	GenerateAccessToken(ctx context.Context, user entity.User, duration time.Duration) (authResponse *entity.AuthResponse, err error)
-	UserSignIn(ctx context.Context, email, password string, remember bool) (authResponse *entity.AuthResponse, err error)
-	GetUserByID(ctx context.Context, userID string) (targetUser *entity.User, err error)
+	RegisterNewUser(ctx context.Context, user entity.User, companyName string) (createdUser *entity.User, company *entity.Company, err error)
+	GenerateAccessToken(ctx context.Context, userID int, companyID int, userEmail string, userRole entity.UserRole) (authResponse *entity.AuthResponse, err error)
+	UserSignIn(ctx context.Context, email, password string, remember bool) (user *entity.User, company *entity.Company, accessToken string, err error)
+	GetUserByID(ctx context.Context, userID int) (targetUser *entity.User, err error)
+	GetCompanyByID(ctx context.Context, ID int) (company *entity.Company, err error)
 }
 
 // AuthHandler handles authentication-related HTTP requests.
@@ -35,6 +35,7 @@ func (h *AuthHandler) RegisterAuthRoutes(e *echo.Group, middleware *Middleware) 
 	e.POST("", h.HandleSignIn)
 	e.POST("/signup", h.HandleSignUp)
 	e.GET("/profile", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.HandleProfile))
+	e.GET("/companies", middleware.AuthMiddleware(AllowedAuthenticatedOnly, h.handleGetCompany))
 }
 
 // HandleProfile godoc
@@ -47,7 +48,7 @@ func (h *AuthHandler) RegisterAuthRoutes(e *echo.Group, middleware *Middleware) 
 //	@Failure	500	{object}	Response
 //	@Router		/api/v1/auth/profile [get]
 func (h *AuthHandler) HandleProfile(c echo.Context) error {
-	userID := c.Get("user_id").(string)
+	userID := c.Get("user_id").(int)
 	ctx := c.Request().Context()
 
 	targetUser, err := h.authService.GetUserByID(ctx, userID)
@@ -58,7 +59,7 @@ func (h *AuthHandler) HandleProfile(c echo.Context) error {
 	return c.JSON(http.StatusOK, Response{
 		StatusCode: http.StatusOK,
 		Message:    fmt.Sprintf("success get profile of %s", targetUser.GetName()),
-		Data:       targetUser,
+		Data:       ProfileResponseFromEntity(targetUser),
 		Error:      nil,
 	})
 }
@@ -89,20 +90,15 @@ func (h *AuthHandler) HandleSignUp(c echo.Context) error {
 		})
 	}
 
-	fmt.Printf("payload: %+v\n", requestBody)
-	countryCode, localNumber, _ := entity.ParsePhoneNumber(requestBody.PhoneNumber)
-
 	toCreateUser := entity.User{
-		FirstName:   requestBody.FirstName,
-		LastName:    &requestBody.LastName,
-		Email:       requestBody.Email,
-		CountryCode: pointer.To(countryCode), // Hardcoded this cause it's only Indo, lol
-		PhoneNumber: pointer.To(localNumber),
-		Password:    requestBody.Password,
-		Role:        entity.UserRole(requestBody.Role),
+		FirstName: requestBody.FirstName,
+		LastName:  &requestBody.LastName,
+		Email:     requestBody.Email,
+		Password:  requestBody.Password,
+		Role:      entity.UserRole(requestBody.Role),
 	}
 
-	newlyCreatedUser, serviceErr := h.authService.RegisterNewUser(ctx, toCreateUser)
+	newlyCreatedUser, company, serviceErr := h.authService.RegisterNewUser(ctx, toCreateUser, requestBody.CompanyName)
 	if serviceErr != nil {
 		switch err := serviceErr.(type) {
 		case entity.GosmError:
@@ -119,19 +115,30 @@ func (h *AuthHandler) HandleSignUp(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, throwInternalServerError(serviceErr))
 	}
 
-	authResponse, err := h.authService.GenerateAccessToken(ctx, *newlyCreatedUser, 12*time.Hour)
+	var companyResponse CompanyResponse
+	if requestBody.CompanyName != "" {
+		companyResponse = CompanyResponseFromEntity(pointer.Get(company))
+	}
+
+	authResponse, err := h.authService.GenerateAccessToken(ctx, newlyCreatedUser.ID, pointer.GetInt(newlyCreatedUser.CompanyID), newlyCreatedUser.Email, newlyCreatedUser.Role)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
 	}
 
 	return c.JSON(http.StatusCreated, Response{
 		StatusCode: http.StatusCreated,
-		Message:    fmt.Sprintf("user %s created", requestBody.FirstName),
+		Message:    fmt.Sprintf("user %s created", requestBody.Email),
 		Data: AccessTokenResponse{
 			AccessToken: authResponse.AccessToken,
-			ExpiresAt:   authResponse.ExpiresAt,
-			Email:       authResponse.Email,
-			Role:        authResponse.Role,
+			User: UserResponse{
+				ID:       newlyCreatedUser.ID,
+				Name:     newlyCreatedUser.GetName(),
+				Email:    newlyCreatedUser.Email,
+				Phone:    newlyCreatedUser.PhoneNumber,
+				JobTitle: newlyCreatedUser.JobTitle,
+				Role:     newlyCreatedUser.Role,
+			},
+			Company: &companyResponse,
 		},
 	})
 }
@@ -162,7 +169,7 @@ func (h *AuthHandler) HandleSignIn(c echo.Context) error {
 		})
 	}
 
-	authResponse, serviceErr := h.authService.UserSignIn(ctx, requestBody.Email, requestBody.Password, requestBody.Remember)
+	user, company, accessToken, serviceErr := h.authService.UserSignIn(ctx, requestBody.Email, requestBody.Password, requestBody.Remember)
 	if serviceErr != nil {
 		logger.Errorf(ctx, ops, "user sign in fails: %v", serviceErr)
 		switch err := serviceErr.(type) {
@@ -180,14 +187,44 @@ func (h *AuthHandler) HandleSignIn(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, throwInternalServerError(serviceErr))
 	}
 
+	var companyResponse CompanyResponse
+	if company != nil {
+		companyResponse = CompanyResponseFromEntity(pointer.Get(company))
+	}
+
 	return c.JSON(http.StatusOK, Response{
 		StatusCode: http.StatusOK,
 		Message:    "success",
 		Data: AccessTokenResponse{
-			AccessToken: authResponse.AccessToken,
-			ExpiresAt:   authResponse.ExpiresAt,
-			Email:       authResponse.Email,
-			Role:        authResponse.Role,
+			AccessToken: accessToken,
+			User: UserResponse{
+				ID:       user.ID,
+				Name:     user.GetName(),
+				Email:    user.Email,
+				Phone:    user.PhoneNumber,
+				JobTitle: user.JobTitle,
+				Role:     user.Role,
+			},
+			Company: &companyResponse,
 		},
 	})
+}
+
+func (h *AuthHandler) handleGetCompany(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	companyID := c.Get("company_id").(int)
+
+	company, err := h.authService.GetCompanyByID(ctx, companyID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
+	}
+
+	return c.JSON(http.StatusOK, Response{
+		StatusCode: http.StatusOK,
+		Message:    "ok",
+		Data:       CompanyResponseFromEntity(pointer.Get(company)),
+		Error:      nil,
+	})
+
 }
