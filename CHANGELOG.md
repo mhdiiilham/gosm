@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.21.0](https://github.com/mhdiiilham/gosm/compare/v1.20.0...v1.21.0) (2025-07-14)
+
+
+### Features
+
+* **migration:** remove automatic migration ([7eaaf7c](https://github.com/mhdiiilham/gosm/commit/7eaaf7c0cd95ea2245a5eb5d378656a3956558bf))
+
 # [1.20.0](https://github.com/mhdiiilham/gosm/compare/v1.19.1...v1.20.0) (2025-07-14)
 
 
