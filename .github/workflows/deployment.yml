@@ -70,8 +70,9 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          docker build -t pkg.dev/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }} --build-arg VERSION=${{ github.ref_name }} --build-arg APP_ENV=${{ github.event.inputs.environment }} .
-          docker push pkg.dev/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
+          IMAGE_URI=us-west1-docker.pkg.dev/${{ vars.GCP_PROJECT }}/gosm/gosm:${{ github.ref_name }}
+          docker build -t $IMAGE_URI --build-arg VERSION=${{ github.ref_name }} --build-arg APP_ENV=${{ github.event.inputs.environment }} .
+          docker push $IMAGE_URI
 
   deployment:
     name: Deploy Image To Cloud Run
