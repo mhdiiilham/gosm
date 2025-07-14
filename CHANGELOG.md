@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.20.0](https://github.com/mhdiiilham/gosm/compare/v1.19.1...v1.20.0) (2025-07-14)
+
+
+### Features
+
+* **wedding:** holy F I forgot everything ([1009967](https://github.com/mhdiiilham/gosm/commit/1009967c92cf576b4819d06a977b0434fbb8811a))
+
 ## [1.19.1](https://github.com/mhdiiilham/gosm/compare/v1.19.0...v1.19.1) (2025-07-14)
 
 
