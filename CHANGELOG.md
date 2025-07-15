@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.24.0](https://github.com/mhdiiilham/gosm/compare/v1.23.0...v1.24.0) (2025-07-15)
+
+
+### Features
+
+* **cd:** deploy image path fix ([4e668bd](https://github.com/mhdiiilham/gosm/commit/4e668bd9c563688c495213c5e866425560dfe5fc))
+
 # [1.23.0](https://github.com/mhdiiilham/gosm/compare/v1.22.0...v1.23.0) (2025-07-15)
 
 
