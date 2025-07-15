@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.22.0](https://github.com/mhdiiilham/gosm/compare/v1.21.1...v1.22.0) (2025-07-15)
+
+
+### Features
+
+* **api:** okay ([8d8ecdc](https://github.com/mhdiiilham/gosm/commit/8d8ecdc194d75fac1e2aae8bc410287ec7de6e31))
+
 ## [1.21.1](https://github.com/mhdiiilham/gosm/compare/v1.21.0...v1.21.1) (2025-07-14)
 
 
