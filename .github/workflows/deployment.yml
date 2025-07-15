@@ -80,22 +80,24 @@ jobs:
     environment: ${{ github.event.inputs.environment }}
     needs: [builder]
     steps:
-      - name: Setup Cloud cli
-        uses: google-github-actions/setup-gcloud@v0.2.0
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          project_id: ${{ vars.GCP_PROJECT }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
 
       - name: Deploy to Cloud Run
-        id: gohibeesh
+        id: deprun
         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: gosm
-          image: us-west1-docker.pkg.dev/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
+          image: us-west1-docker.pkg.dev/${{ vars.GCP_PROJECT }}/gosm/gosm:${{ github.ref_name }}
           region: us-west1
           env_vars: |-
             APP_ENV=${{ github.event.inputs.environment }}
 
       - name: Show Output
-        run: echo ${{ steps.gohibeesh.outputs.url }}
+        run: echo ${{ steps.deprun.outputs.url }}
