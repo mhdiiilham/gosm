@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.23.0](https://github.com/mhdiiilham/gosm/compare/v1.22.0...v1.23.0) (2025-07-15)
+
+
+### Features
+
+* **cd:** fix ci ([c0b2359](https://github.com/mhdiiilham/gosm/commit/c0b2359578e6b84405eb8545f47632ee2ac41a51))
+
 # [1.22.0](https://github.com/mhdiiilham/gosm/compare/v1.21.1...v1.22.0) (2025-07-15)
 
 
