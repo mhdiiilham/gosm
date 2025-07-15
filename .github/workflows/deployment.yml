@@ -92,7 +92,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: gosm
-          image: pkg.dev/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
+          image: us-west1-docker.pkg.dev/${{ vars.GCP_PROJECT }}/gosm:${{ github.ref_name }}
           region: us-west1
           env_vars: |-
             APP_ENV=${{ github.event.inputs.environment }}
