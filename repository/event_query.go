@@ -107,8 +107,8 @@ var (
 	// The guest will be associated with a specific event by `event_uuid`.
 	// The query ensures that duplicate guests (same name and phone number) are not added.
 	SQLStatementAddGuestToEvent = `
-		INSERT INTO guests (event_id, name, email, phone, is_vip, barcode_id)
-		VALUES ($1, $2, $3, $4, $5, $6);
+		INSERT INTO guests (event_id, name, email, phone, is_vip, barcode_id, is_attending)
+		VALUES ($1, $2, $3, $4, $5, $6, $7);
 	`
 
 	// SQLStatementGetGuestList retrieves all guests associated with a given event.
@@ -138,7 +138,8 @@ var (
 			phone,
 			is_vip,
 			checked_in,
-			barcode_id
+			barcode_id,
+			is_attending
 		FROM guests
 		WHERE guests.barcode_id = $1
 		LIMIT 1;

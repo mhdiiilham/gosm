@@ -11,4 +11,5 @@ type Guest struct {
 	CheckedIn   bool   `json:"checkedIn"`
 	CheckedInBy int    `json:"checkedInBy"`
 	BarcodeID   string `json:"barcode"`
+	IsAttending bool   `json:"isAttending"`
 }

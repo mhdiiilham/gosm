@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mhdiiilham/gosm/entity"
+	"github.com/mhdiiilham/gosm/pkg"
 )
 
 // CountryService defines the interface for country-related data operations.
@@ -78,5 +80,38 @@ func HandleGetCountries(srv CountryService) echo.HandlerFunc {
 			},
 		)
 
+	}
+}
+
+func AddGuestToEvent(srv EventService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		eventID, _ := strconv.Atoi(c.Param("eventId"))
+
+		var request PublicAddGuestRequest
+		if err := c.Bind(&request); err != nil {
+			return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
+		}
+
+		barcodeID, _ := pkg.GeneratePumBookID(strconv.Itoa(eventID))
+		_, err := srv.AddGuests(c.Request().Context(), eventID, []entity.Guest{
+			{
+
+				EventID:     eventID,
+				BarcodeID:   barcodeID,
+				Name:        request.Name,
+				Phone:       pkg.FormatPhoneToWaMe(request.Phone),
+				IsAttending: request.IsAttending,
+			},
+		})
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
+		}
+
+		return c.JSON(http.StatusOK, Response{
+			StatusCode: http.StatusOK,
+			Message:    "guest added",
+			Data:       barcodeID,
+			Error:      nil,
+		})
 	}
 }

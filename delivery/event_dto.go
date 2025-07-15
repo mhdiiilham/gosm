@@ -53,3 +53,9 @@ type EventResponse struct {
 	CheckedInCount int    `json:"checkedInCount"`
 	Status         string `json:"status"`
 }
+
+type PublicAddGuestRequest struct {
+	Name        string `json:"name"`
+	Phone       string `json:"phone"`
+	IsAttending bool   `json:"isAttending"`
+}

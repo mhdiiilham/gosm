@@ -143,7 +143,11 @@ func (r *EventRepository) AddGuests(ctx context.Context, eventID int, guestList 
 	const ops = "EventRepository.AddGuests"
 
 	for _, guest := range guestList {
-		id, _ := pkg.GeneratePumBookID(strconv.Itoa(eventID))
+		barcodeID := guest.BarcodeID
+		if barcodeID == "" {
+			barcodeID, _ = pkg.GeneratePumBookID(strconv.Itoa(eventID))
+		}
+
 		r, err := r.db.ExecContext(
 			ctx, SQLStatementAddGuestToEvent,
 			eventID,
@@ -151,7 +155,8 @@ func (r *EventRepository) AddGuests(ctx context.Context, eventID int, guestList 
 			guest.Email,
 			guest.Phone,
 			guest.IsVIP,
-			id,
+			barcodeID,
+			guest.IsAttending,
 		)
 		if err != nil {
 			logger.Errorf(ctx, ops, "failed to add guest to an event: %v", err)
@@ -243,6 +248,7 @@ func (r *EventRepository) GetGuest(ctx context.Context, barcodeID string) (guest
 		&targetGuest.IsVIP,
 		&targetGuest.CheckedIn,
 		&targetGuest.BarcodeID,
+		&targetGuest.IsAttending,
 	); err != nil {
 		logger.Errorf(ctx, "EventRepository.GetGuest", "failed to retrieve guest: %v", err)
 		return nil, err
