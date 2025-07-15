@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.24.1](https://github.com/mhdiiilham/gosm/compare/v1.24.0...v1.24.1) (2025-07-15)
+
+
+### Bug Fixes
+
+* **ci:** deploy to cloud run ([d4729eb](https://github.com/mhdiiilham/gosm/commit/d4729eb97e39e691098c6b453dc43384d5f7ce5b))
+
 # [1.24.0](https://github.com/mhdiiilham/gosm/compare/v1.23.0...v1.24.0) (2025-07-15)
 
 
