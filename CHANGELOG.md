@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.27.0](https://github.com/mhdiiilham/gosm/compare/v1.26.0...v1.27.0) (2025-07-16)
+
+
+### Features
+
+* fetch guest messages ([61fb047](https://github.com/mhdiiilham/gosm/commit/61fb047615a2540cc15b0303789599cf7a009e54))
+
 # [1.26.0](https://github.com/mhdiiilham/gosm/compare/v1.25.1...v1.26.0) (2025-07-16)
 
 
