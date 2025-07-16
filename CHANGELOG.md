@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.25.0](https://github.com/mhdiiilham/gosm/compare/v1.24.1...v1.25.0) (2025-07-16)
+
+
+### Features
+
+* **update-guest:** update guest is id exist ([b97e19a](https://github.com/mhdiiilham/gosm/commit/b97e19a60f8e4a475e1bdfb74bc9185319f44a13))
+
 ## [1.24.1](https://github.com/mhdiiilham/gosm/compare/v1.24.0...v1.24.1) (2025-07-15)
 
 
