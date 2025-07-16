@@ -88,6 +88,7 @@ func main() {
 	// register routes here:
 	e.GET("/api/v1/public/guests", delivery.GetGuestByItShortID(eventService))
 	e.POST("/api/v1/public/guests/:eventId", delivery.AddGuestToEvent(eventService))
+	e.GET("/api/v1/public/guests/:eventId/messages", delivery.HandleGetGuestMessages(eventService))
 
 	middleware := delivery.NewMiddleware(jwtToken, userRepository)
 

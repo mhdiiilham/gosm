@@ -24,6 +24,7 @@ type EventRepository interface {
 	DeleteEvent(ctx context.Context, eventID int) (bool, error)
 	SetGuestIsArrived(ctx context.Context, guestID int, isArrived bool) (err error)
 	UpdateGuest(ctx context.Context, guestID, name, phone, message string, isAttending bool) error
+	GetGuestMessages(ctx context.Context, eventID string) ([]entity.GuestMessages, error)
 }
 
 // KirimWAClient defines an interface for sending WhatsApp messages.
@@ -160,4 +161,8 @@ func (s *EventService) GetGuest(ctx context.Context, barcodeID string) (guest *e
 
 func (s *EventService) UpdateGuest(ctx context.Context, guestID, name, phone, message string, isAttending bool) error {
 	return s.eventRepository.UpdateGuest(ctx, guestID, name, phone, message, isAttending)
+}
+
+func (s *EventService) GetGuestMessages(ctx context.Context, eventID string) ([]entity.GuestMessages, error) {
+	return s.eventRepository.GetGuestMessages(ctx, eventID)
 }

@@ -128,3 +128,18 @@ func AddGuestToEvent(srv EventService) echo.HandlerFunc {
 		})
 	}
 }
+
+func HandleGetGuestMessages(srv EventService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		eventID := c.Param("eventId")
+
+		messages, _ := srv.GetGuestMessages(c.Request().Context(), eventID)
+
+		return c.JSON(http.StatusOK, Response{
+			StatusCode: http.StatusOK,
+			Message:    "",
+			Data:       messages,
+			Error:      nil,
+		})
+	}
+}

@@ -193,6 +193,15 @@ var (
 		WHERE guests.barcode_id = $5
 	`
 
+	// SQLStatementGetGuestMessages
+	SQLStatementGetGuestMessages = `
+		SELECT
+			name,
+			message
+		FROM guests
+		WHERE guests.event_id = $1 AND message IS NOT NULL;
+	`
+
 	// SQLStatementDeleteEvent soft delete an events.
 	SQLStatementDeleteEvent = `
 		UPDATE events

@@ -353,3 +353,24 @@ func (r *EventRepository) UpdateGuest(ctx context.Context, guestID, name, phone,
 
 	return nil
 }
+
+func (r *EventRepository) GetGuestMessages(ctx context.Context, eventID string) ([]entity.GuestMessages, error) {
+	rows, err := r.db.QueryContext(ctx, SQLStatementGetGuestMessages, eventID)
+	if err != nil {
+		logger.Errorf(ctx, "EventRepository.DeleteEvent", "failed to get guest messages: %v", err)
+	}
+
+	messages := []entity.GuestMessages{}
+	for rows.Next() {
+		var message entity.GuestMessages
+
+		rows.Scan(
+			&message.Name,
+			&message.Message,
+		)
+
+		messages = append(messages, message)
+	}
+
+	return messages, nil
+}

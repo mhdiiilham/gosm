@@ -13,3 +13,8 @@ type Guest struct {
 	BarcodeID   string `json:"barcode"`
 	IsAttending bool   `json:"isAttending"`
 }
+
+type GuestMessages struct {
+	Name    string `json:"name"`
+	Message string `json:"message"`
+}
