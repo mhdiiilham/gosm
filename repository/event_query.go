@@ -189,7 +189,7 @@ var (
 			SET name = $1,
 				is_attending = $2,
 				phone = $3,
-				message = $4,
+				message = $4
 		WHERE guests.barcode_id = $5
 	`
 
