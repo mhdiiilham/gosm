@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.25.1](https://github.com/mhdiiilham/gosm/compare/v1.25.0...v1.25.1) (2025-07-16)
+
+
+### Bug Fixes
+
+* **update-guest:** update guest query ([5dcb2d6](https://github.com/mhdiiilham/gosm/commit/5dcb2d688d2fd11bd21cf2fb06b92ed152e92eb3))
+
 # [1.25.0](https://github.com/mhdiiilham/gosm/compare/v1.24.1...v1.25.0) (2025-07-16)
 
 
