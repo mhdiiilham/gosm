@@ -12,6 +12,7 @@ type Guest struct {
 	CheckedInBy int    `json:"checkedInBy"`
 	BarcodeID   string `json:"barcode"`
 	IsAttending bool   `json:"isAttending"`
+	Message     string `json:"message"`
 }
 
 type GuestMessages struct {

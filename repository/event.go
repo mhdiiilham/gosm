@@ -157,6 +157,7 @@ func (r *EventRepository) AddGuests(ctx context.Context, eventID int, guestList 
 			guest.IsVIP,
 			barcodeID,
 			guest.IsAttending,
+			guest.Message,
 		)
 		if err != nil {
 			logger.Errorf(ctx, ops, "failed to add guest to an event: %v", err)
