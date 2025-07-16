@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.27.1](https://github.com/mhdiiilham/gosm/compare/v1.27.0...v1.27.1) (2025-07-16)
+
+
+### Bug Fixes
+
+* **update-guest:** sql error ([2c81429](https://github.com/mhdiiilham/gosm/commit/2c81429e19e82b7da7710fd67ec8ae219b9dffb3))
+
 # [1.27.0](https://github.com/mhdiiilham/gosm/compare/v1.26.0...v1.27.0) (2025-07-16)
 
 
