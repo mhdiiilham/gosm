@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.27.2](https://github.com/mhdiiilham/gosm/compare/v1.27.1...v1.27.2) (2025-07-16)
+
+
+### Bug Fixes
+
+* **message:** add message for new guest ([3512c9c](https://github.com/mhdiiilham/gosm/commit/3512c9c63c21003bdd90a799ca47a59353d6df96))
+
 ## [1.27.1](https://github.com/mhdiiilham/gosm/compare/v1.27.0...v1.27.1) (2025-07-16)
 
 
