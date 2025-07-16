@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.26.0](https://github.com/mhdiiilham/gosm/compare/v1.25.1...v1.26.0) (2025-07-16)
+
+
+### Features
+
+* message for the couple ([3fae25b](https://github.com/mhdiiilham/gosm/commit/3fae25b6d6af7eca8412df10866be349533984d5))
+
 ## [1.25.1](https://github.com/mhdiiilham/gosm/compare/v1.25.0...v1.25.1) (2025-07-16)
 
 
