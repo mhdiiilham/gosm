@@ -345,8 +345,8 @@ func (r *EventRepository) SetGuestIsArrived(ctx context.Context, guestID int, is
 	return nil
 }
 
-func (r *EventRepository) UpdateGuest(ctx context.Context, guestID, name, phone string, isAttending bool) error {
-	_, err := r.db.ExecContext(ctx, SQLStatementUpdateGuest, name, isAttending, phone, guestID)
+func (r *EventRepository) UpdateGuest(ctx context.Context, guestID, name, phone, message string, isAttending bool) error {
+	_, err := r.db.ExecContext(ctx, SQLStatementUpdateGuest, name, isAttending, phone, message, guestID)
 	if err != nil {
 		logger.Errorf(ctx, "EventRepository.DeleteEvent", "failed to update guest: %v", err)
 	}

@@ -188,8 +188,9 @@ var (
 		UPDATE guests
 			SET name = $1,
 				is_attending = $2,
-				phone = $3
-		WHERE guests.barcode_id = $4
+				phone = $3,
+				message = $4,
+		WHERE guests.barcode_id = $5
 	`
 
 	// SQLStatementDeleteEvent soft delete an events.

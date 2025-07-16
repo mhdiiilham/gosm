@@ -93,7 +93,7 @@ func AddGuestToEvent(srv EventService) echo.HandlerFunc {
 		}
 
 		if request.ID != "" {
-			if err := srv.UpdateGuest(c.Request().Context(), request.ID, request.Name, pkg.FormatPhoneToWaMe(request.Phone), request.IsAttending); err != nil {
+			if err := srv.UpdateGuest(c.Request().Context(), request.ID, request.Name, pkg.FormatPhoneToWaMe(request.Phone), request.Message, request.IsAttending); err != nil {
 				return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
 			}
 

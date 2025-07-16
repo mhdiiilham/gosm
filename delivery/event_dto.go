@@ -58,5 +58,6 @@ type PublicAddGuestRequest struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Phone       string `json:"phone"`
+	Message     string `json:"message"`
 	IsAttending bool   `json:"isAttending"`
 }
