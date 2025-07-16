@@ -183,6 +183,15 @@ var (
 		WHERE short_id = $2;
 	`
 
+	// SQLStatementUpdateGuest ...
+	SQLStatementUpdateGuest = `
+		UPDATE guests
+			SET name = $1,
+				is_attending = $2,
+				phone = $3
+		WHERE guests.barcode_id = $4
+	`
+
 	// SQLStatementDeleteEvent soft delete an events.
 	SQLStatementDeleteEvent = `
 		UPDATE events

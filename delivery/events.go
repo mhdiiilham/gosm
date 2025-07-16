@@ -33,6 +33,7 @@ type EventService interface {
 	SetGuestIsArrived(ctx context.Context, guestID int, isArrived bool) (err error)
 	GetGuests(ctx context.Context, eventID int) (guests []entity.Guest, err error)
 	GetGuest(ctx context.Context, barcodeID string) (guest *entity.Guest, err error)
+	UpdateGuest(ctx context.Context, guestID, name, phone string, isAttending bool) error
 }
 
 // EventHandler handles HTTP requests related to event operations.

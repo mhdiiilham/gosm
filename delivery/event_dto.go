@@ -55,6 +55,7 @@ type EventResponse struct {
 }
 
 type PublicAddGuestRequest struct {
+	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Phone       string `json:"phone"`
 	IsAttending bool   `json:"isAttending"`

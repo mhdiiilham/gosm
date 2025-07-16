@@ -92,6 +92,19 @@ func AddGuestToEvent(srv EventService) echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
 		}
 
+		if request.ID != "" {
+			if err := srv.UpdateGuest(c.Request().Context(), request.ID, request.Name, pkg.FormatPhoneToWaMe(request.Phone), request.IsAttending); err != nil {
+				return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
+			}
+
+			return c.JSON(http.StatusOK, Response{
+				StatusCode: http.StatusOK,
+				Message:    "guest added",
+				Data:       request.ID,
+				Error:      nil,
+			})
+		}
+
 		barcodeID, _ := pkg.GeneratePumBookID(strconv.Itoa(eventID))
 		_, err := srv.AddGuests(c.Request().Context(), eventID, []entity.Guest{
 			{
