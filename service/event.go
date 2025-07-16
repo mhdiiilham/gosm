@@ -22,7 +22,7 @@ type EventRepository interface {
 	UpdateGuestInvitation(ctx context.Context, guest entity.Guest) (err error)
 	UpdateGuestAttendingStatus(ctx context.Context, guestID int, isAttending bool, message string) (err error)
 	DeleteEvent(ctx context.Context, eventID int) (bool, error)
-	SetGuestIsArrived(ctx context.Context, guestID int, isArrived bool) (err error)
+	SetGuestIsArrived(ctx context.Context, barcodeID string, isArrived bool) (err error)
 	UpdateGuest(ctx context.Context, guestID, name, phone, message string, isAttending bool) error
 	GetGuestMessages(ctx context.Context, eventID string) ([]entity.GuestMessages, error)
 }
@@ -145,8 +145,8 @@ func (s *EventService) DeleteEvent(ctx context.Context, eventID int) (success bo
 }
 
 // SetGuestIsArrived set an guest is_arrived status.
-func (s *EventService) SetGuestIsArrived(ctx context.Context, guestID int, isArrived bool) (err error) {
-	return s.eventRepository.SetGuestIsArrived(ctx, guestID, isArrived)
+func (s *EventService) SetGuestIsArrived(ctx context.Context, barcodeID string, isArrived bool) (err error) {
+	return s.eventRepository.SetGuestIsArrived(ctx, barcodeID, isArrived)
 }
 
 // GetGuests ...

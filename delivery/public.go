@@ -8,7 +8,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mhdiiilham/gosm/entity"
-	"github.com/mhdiiilham/gosm/logger"
 	"github.com/mhdiiilham/gosm/pkg"
 )
 
@@ -92,8 +91,6 @@ func AddGuestToEvent(srv EventService) echo.HandlerFunc {
 		if err := c.Bind(&request); err != nil {
 			return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
 		}
-
-		logger.Infof(c.Request().Context(), "AddGuestToEvent", "request %+v", request)
 
 		if request.ID != "" {
 			if err := srv.UpdateGuest(c.Request().Context(), request.ID, request.Name, pkg.FormatPhoneToWaMe(request.Phone), request.Message, request.IsAttending); err != nil {

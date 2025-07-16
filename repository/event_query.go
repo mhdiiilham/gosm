@@ -178,9 +178,10 @@ var (
 
 	// SQLStatementUpdateGuestArrived update guest is_arrived
 	SQLStatementUpdateGuestArrived = `
-		UPDATE event_user_guests
-			SET is_arrived = $1
-		WHERE short_id = $2;
+		UPDATE guests
+			SET checked_in = $1,
+				checked_in_at = NOW()
+		WHERE barcode_id = $2;
 	`
 
 	// SQLStatementUpdateGuest ...

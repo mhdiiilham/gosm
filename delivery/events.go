@@ -30,7 +30,7 @@ type EventService interface {
 	UpdateGuestVIPStatus(ctx context.Context, guestID int, vipStatus bool) (err error)
 	UpdateEvent(ctx context.Context, event entity.Event) (err error)
 	DeleteEvent(ctx context.Context, eventID int) (success bool, err error)
-	SetGuestIsArrived(ctx context.Context, guestID int, isArrived bool) (err error)
+	SetGuestIsArrived(ctx context.Context, barcodeID string, isArrived bool) (err error)
 	GetGuests(ctx context.Context, eventID int) (guests []entity.Guest, err error)
 	GetGuest(ctx context.Context, barcodeID string) (guest *entity.Guest, err error)
 	UpdateGuest(ctx context.Context, guestID, name, phone, message string, isAttending bool) error
@@ -528,15 +528,11 @@ func (h *EventHandler) handleDeleteEvent(c echo.Context) error {
 //	@Failure		500			{object}	Response	"Internal server error"
 //	@Router			/events/{uuid}/guests/arrived [post]
 func (h *EventHandler) handleUpdateGuestArrived(c echo.Context) error {
-	guestID, err := strconv.Atoi(c.QueryParam("short_id"))
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, throwInternalServerError(err))
-	}
-
+	barcodeID := c.QueryParam("barcode_id")
 	isArrived, _ := strconv.ParseBool(c.QueryParam("is_arrived"))
 	ctx := c.Request().Context()
 
-	if err := h.eventService.SetGuestIsArrived(ctx, guestID, isArrived); err != nil {
+	if err := h.eventService.SetGuestIsArrived(ctx, barcodeID, isArrived); err != nil {
 		switch parsedErr := err.(type) {
 		case entity.GosmError:
 			if parsedErr.Type == entity.GosmErrorTypeBadRequest {
@@ -554,7 +550,7 @@ func (h *EventHandler) handleUpdateGuestArrived(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, Response{
 		StatusCode: http.StatusOK,
-		Message:    fmt.Sprintf("Guest %d updated to arrived: %v", guestID, isArrived),
+		Message:    fmt.Sprintf("Guest %s updated to arrived: %v", barcodeID, isArrived),
 		Data:       nil,
 		Error:      nil,
 	})
