@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.28.0](https://github.com/mhdiiilham/gosm/compare/v1.27.2...v1.28.0) (2025-07-17)
+
+
+### Features
+
+* **checkin:** update set guest checkin api ([d807fab](https://github.com/mhdiiilham/gosm/commit/d807fab0dbb050692e131dd8a851b48a513be65d))
+
 ## [1.27.2](https://github.com/mhdiiilham/gosm/compare/v1.27.1...v1.27.2) (2025-07-16)
 
 
