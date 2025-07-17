@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.28.1](https://github.com/mhdiiilham/gosm/compare/v1.28.0...v1.28.1) (2025-07-17)
+
+
+### Bug Fixes
+
+* exlcude empty string message ([49ff14c](https://github.com/mhdiiilham/gosm/commit/49ff14c24e9c7732a975f887703c48fc347a8c07))
+
 # [1.28.0](https://github.com/mhdiiilham/gosm/compare/v1.27.2...v1.28.0) (2025-07-17)
 
 
