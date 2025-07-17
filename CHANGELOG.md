@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.28.2](https://github.com/mhdiiilham/gosm/compare/v1.28.1...v1.28.2) (2025-07-17)
+
+
+### Bug Fixes
+
+* query guest message on pumbook ([1c844b3](https://github.com/mhdiiilham/gosm/commit/1c844b3cb7296cfab21eecb158d5fec1c700120b))
+
 ## [1.28.1](https://github.com/mhdiiilham/gosm/compare/v1.28.0...v1.28.1) (2025-07-17)
 
 
