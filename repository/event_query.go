@@ -122,7 +122,8 @@ var (
 			phone,
 			is_vip,
 			checked_in,
-			barcode_id
+			barcode_id,
+			message
 		FROM guests
 		WHERE guests.event_id = $1
 		ORDER BY guests.is_vip DESC;

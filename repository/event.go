@@ -198,6 +198,7 @@ func (r *EventRepository) GetGuests(ctx context.Context, eventID int) (response 
 			&guest.IsVIP,
 			&guest.CheckedIn,
 			&guest.BarcodeID,
+			&guest.Message,
 		)
 
 		response = append(response, guest)
