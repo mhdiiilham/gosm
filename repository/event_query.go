@@ -200,7 +200,9 @@ var (
 			name,
 			message
 		FROM guests
-		WHERE guests.event_id = $1 AND message IS NOT NULL;
+		WHERE guests.event_id = $1
+			AND message IS NOT NULL
+			AND guests.message != '';
 	`
 
 	// SQLStatementDeleteEvent soft delete an events.
